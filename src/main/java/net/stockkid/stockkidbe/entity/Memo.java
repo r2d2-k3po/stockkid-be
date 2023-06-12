@@ -10,7 +10,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Memo {
+public class Memo extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,4 +18,8 @@ public class Memo {
 
     @Column(length = 200, nullable = false)
     private String memoText;
+
+    public void changeMemoText(String memoText) {
+        this.memoText = memoText;
+    }
 }
