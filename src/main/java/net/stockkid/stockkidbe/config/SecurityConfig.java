@@ -3,6 +3,8 @@ package net.stockkid.stockkidbe.config;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
@@ -21,8 +23,13 @@ import static org.springframework.security.config.Customizer.withDefaults;
 public class SecurityConfig {
 
     @Bean
-    PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+    static RoleHierarchy roleHierarchy() {
+        var hierarchy = new RoleHierarchyImpl();
+        hierarchy.setHierarchy("ROLE_ADMIN > ROLE_STAFF\n" +
+                "ROLE_STAFF > ROLE_USER\n" +
+                "ROLE_USER > ROLE_GUEST");
+
+        return hierarchy;
     }
 
     @Bean
@@ -31,11 +38,17 @@ public class SecurityConfig {
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/sample/all").permitAll()
                         .requestMatchers("/sample/admin").hasRole("ADMIN")
+                        .requestMatchers("/sample/member").hasRole("USER")
                         .anyRequest().authenticated()
                 )
                 .httpBasic(withDefaults());
 
         return http.build();
+    }
+
+    @Bean
+    PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
     @Bean
@@ -50,8 +63,9 @@ public class SecurityConfig {
                 .build();
         UserDetails admin = User.withUsername("admin")
                 .password("$2a$10$P8cwPHZJmuV3YvraYALujuP2o.JZNyUdPD1hhUfbNRlWcqXK9dDnm")
-                .roles("ADMIN", "USER")
+                .roles("ADMIN")
                 .build();
+
         return new InMemoryUserDetailsManager(user1, user2, admin);
     }
 }
