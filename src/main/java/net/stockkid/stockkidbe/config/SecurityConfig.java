@@ -1,6 +1,7 @@
 package net.stockkid.stockkidbe.config;
 
 import lombok.extern.log4j.Log4j2;
+import net.stockkid.stockkidbe.entity.MemberRole;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
@@ -25,9 +26,7 @@ public class SecurityConfig {
     @Bean
     static RoleHierarchy roleHierarchy() {
         var hierarchy = new RoleHierarchyImpl();
-        hierarchy.setHierarchy("ROLE_ADMIN > ROLE_STAFF\n" +
-                "ROLE_STAFF > ROLE_USER\n" +
-                "ROLE_USER > ROLE_GUEST");
+        hierarchy.setHierarchy(MemberRole.getRoleHierarchy());
 
         return hierarchy;
     }
@@ -41,7 +40,9 @@ public class SecurityConfig {
                         .requestMatchers("/sample/member").hasRole("USER")
                         .anyRequest().authenticated()
                 )
-                .httpBasic(withDefaults());
+                .httpBasic(withDefaults())
+                .csrf((csrf) -> csrf.disable())
+                .logout((logout) -> logout.permitAll());
 
         return http.build();
     }
