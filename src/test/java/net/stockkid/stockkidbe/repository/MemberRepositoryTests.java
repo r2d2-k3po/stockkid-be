@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.Optional;
 import java.util.stream.IntStream;
 
 @SpringBootTest
@@ -40,5 +41,13 @@ public class MemberRepositoryTests {
                     .build();
             memberRepository.save(member);
         });
+    }
+
+    @Test
+    public void testRead() {
+        Optional<Member> result = memberRepository.findByUsername("admin1@stockkid.net", false);
+
+        Member member = result.get();
+        System.out.println(member);
     }
 }
