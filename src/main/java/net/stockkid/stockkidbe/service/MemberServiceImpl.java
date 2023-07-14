@@ -1,0 +1,94 @@
+package net.stockkid.stockkidbe.service;
+
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+import net.stockkid.stockkidbe.dto.MemberDTO;
+import net.stockkid.stockkidbe.entity.Member;
+import net.stockkid.stockkidbe.repository.MemberRepository;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import java.util.Optional;
+
+@Log4j2
+@Service
+@RequiredArgsConstructor
+public class MemberServiceImpl implements MemberService {
+
+    private final MemberRepository memberRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    @Override
+    public void createUser(MemberDTO dto) throws IllegalArgumentException {
+
+        log.info("DTO -------------------------");
+        log.info(dto);
+
+        if (userExists(dto.getUsername())) {
+            throw new IllegalArgumentException("User already exists");
+        } else {
+
+            Member entity = dtoToEntity(dto);
+            log.info(entity);
+            memberRepository.save(entity);
+        }
+    }
+
+    @Override
+    public void updateUser(MemberDTO dto) throws UsernameNotFoundException {
+
+        Optional<Member> optionalUser = memberRepository.findByUsername(dto.getUsername());
+        Member existingUser = optionalUser.orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        existingUser.setPassword(passwordEncoder.encode(dto.getPassword()));
+        existingUser.setMemberRole(dto.getMemberRole());
+        existingUser.setAccountNonExpired(dto.isAccountNonExpired());
+        existingUser.setAccountNonLocked(dto.isAccountNonLocked());
+        existingUser.setCredentialsNonExpired(dto.isCredentialsNonExpired());
+        existingUser.setEnabled(dto.isEnabled());
+        existingUser.setFromSocial(dto.isFromSocial());
+
+        memberRepository.save(existingUser);
+    }
+
+    @Override
+    public void deleteUser(String username) throws UsernameNotFoundException {
+
+        Optional<Member> optionalUser = memberRepository.findByUsername(username);
+        Member user = optionalUser.orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        memberRepository.delete(user);
+
+    }
+
+    @Override
+    public void changePassword(String oldPassword, String newPassword) throws UsernameNotFoundException, BadCredentialsException {
+
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Optional<Member> optionalUser = memberRepository.findByUsername(username);
+        Member existingUser = optionalUser.orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        if (passwordEncoder.matches(oldPassword, existingUser.getPassword())) {
+            existingUser.setPassword(passwordEncoder.encode(newPassword));
+            memberRepository.save(existingUser);
+        } else {
+            throw new BadCredentialsException("Bad Credentials Exception");
+        }
+    }
+
+    @Override
+    public boolean userExists(String username) {
+
+        return memberRepository.existsByUsername(username);
+    }
+
+
+//    public List<UserDetails> loadAllUsers() {
+//        // Implement the logic to load all users from the repository and convert them to UserDetails objects
+//        // Return the list of UserDetails
+//        return null;
+}

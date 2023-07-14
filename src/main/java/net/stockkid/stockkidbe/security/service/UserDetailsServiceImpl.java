@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.stockkid.stockkidbe.entity.Member;
 import net.stockkid.stockkidbe.repository.MemberRepository;
-import net.stockkid.stockkidbe.security.dto.MemberDTO;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -17,7 +17,7 @@ import java.util.Optional;
 @Log4j2
 @Service
 @RequiredArgsConstructor
-public class MemberDetailsService implements UserDetailsService {
+public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final MemberRepository memberRepository;
 
@@ -26,10 +26,10 @@ public class MemberDetailsService implements UserDetailsService {
 
         log.info("MemberDetailsService loadUserByUsername " + username);
 
-        Optional<Member> result = memberRepository.findByUsername(username, false);
+        Optional<Member> result = memberRepository.findByUsername(username);
 
         if (result.isEmpty()) {
-            throw new UsernameNotFoundException("Check username or Social");
+            throw new UsernameNotFoundException("User not found");
         }
 
         Member member = result.get();
@@ -37,9 +37,7 @@ public class MemberDetailsService implements UserDetailsService {
         log.info("----------------------------------------------");
         log.info(member);
 
-        return new MemberDTO(
-                member.getMemberId(),
-                member.isFromSocial(),
+        return new User(
                 member.getUsername(),
                 member.getPassword(),
                 member.isEnabled(),
