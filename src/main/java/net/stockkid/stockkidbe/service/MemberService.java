@@ -41,6 +41,7 @@ public interface MemberService {
                 .accountNonLocked(entity.isAccountNonLocked())
                 .credentialsNonExpired(entity.isCredentialsNonExpired())
                 .enabled(entity.isEnabled())
+                .fromSocial(entity.isFromSocial())
                 .regDate(entity.getRegDate())
                 .modDate(entity.getModDate())
                 .build();

@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.stockkid.stockkidbe.dto.MemberDTO;
 import net.stockkid.stockkidbe.entity.Member;
+import net.stockkid.stockkidbe.entity.MemberRole;
 import net.stockkid.stockkidbe.repository.MemberRepository;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,11 +18,13 @@ import java.util.Optional;
 @Log4j2
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
 
+    // permitAll
     @Override
     public void createUser(MemberDTO dto) throws IllegalArgumentException {
 
@@ -31,18 +34,33 @@ public class MemberServiceImpl implements MemberService {
         if (userExists(dto.getUsername())) {
             throw new IllegalArgumentException("User already exists");
         } else {
+            dto.setMemberId(null);
+            dto.setMemberRole(MemberRole.USER);
+            dto.setAccountNonExpired(true);
+            dto.setAccountNonLocked(true);
+            dto.setCredentialsNonExpired(true);
+            dto.setEnabled(true);
+            dto.setFromSocial(false);
 
             Member entity = dtoToEntity(dto);
+            entity.setPassword(passwordEncoder.encode(dto.getPassword()));
             log.info(entity);
             memberRepository.save(entity);
         }
     }
 
+    // ADMIN
     @Override
-    public void updateUser(MemberDTO dto) throws UsernameNotFoundException {
+    public void updateUser(MemberDTO dto) throws IllegalArgumentException, UsernameNotFoundException {
 
-        Optional<Member> optionalUser = memberRepository.findByUsername(dto.getUsername());
-        Member existingUser = optionalUser.orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        Member existingUser;
+        if (dto.getMemberId() == null) {
+            Optional<Member> optionalUser = memberRepository.findByUsername(dto.getUsername());
+            existingUser = optionalUser.orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        } else {
+            Optional<Member> optionalUser = memberRepository.findById(dto.getMemberId());
+            existingUser = optionalUser.orElseThrow(() -> new IllegalArgumentException("memberId not found"));
+        }
 
         existingUser.setPassword(passwordEncoder.encode(dto.getPassword()));
         existingUser.setMemberRole(dto.getMemberRole());
@@ -55,6 +73,7 @@ public class MemberServiceImpl implements MemberService {
         memberRepository.save(existingUser);
     }
 
+    // ADMIN
     @Override
     public void deleteUser(String username) throws UsernameNotFoundException {
 
@@ -65,6 +84,7 @@ public class MemberServiceImpl implements MemberService {
 
     }
 
+    //USER
     @Override
     public void changePassword(String oldPassword, String newPassword) throws UsernameNotFoundException, BadCredentialsException {
 
@@ -86,6 +106,7 @@ public class MemberServiceImpl implements MemberService {
         return memberRepository.existsByUsername(username);
     }
 
+// STAFF
 
 //    public List<UserDetails> loadAllUsers() {
 //        // Implement the logic to load all users from the repository and convert them to UserDetails objects
