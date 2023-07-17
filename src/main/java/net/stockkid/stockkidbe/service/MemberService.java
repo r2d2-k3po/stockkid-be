@@ -9,6 +9,12 @@ public interface MemberService {
 
     void updateUser(MemberDTO dto);
 
+    void deleteUser(String username);
+
+    void changePassword(String oldPassword, String newPassword);
+
+    boolean userExists(String username);
+
 
 
     default Member dtoToEntity(MemberDTO dto) {
@@ -35,6 +41,7 @@ public interface MemberService {
                 .accountNonLocked(entity.isAccountNonLocked())
                 .credentialsNonExpired(entity.isCredentialsNonExpired())
                 .enabled(entity.isEnabled())
+                .fromSocial(entity.isFromSocial())
                 .regDate(entity.getRegDate())
                 .modDate(entity.getModDate())
                 .build();
