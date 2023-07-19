@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.stockkid.stockkidbe.dto.MemberDTO;
 import net.stockkid.stockkidbe.entity.Member;
-import net.stockkid.stockkidbe.entity.MemberRole;
 import net.stockkid.stockkidbe.repository.MemberRepository;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -34,14 +33,6 @@ public class MemberServiceImpl implements MemberService {
         if (userExists(dto.getUsername())) {
             throw new IllegalArgumentException("User already exists");
         } else {
-            dto.setMemberId(null);
-            dto.setMemberRole(MemberRole.USER);
-            dto.setAccountNonExpired(true);
-            dto.setAccountNonLocked(true);
-            dto.setCredentialsNonExpired(true);
-            dto.setEnabled(true);
-            dto.setFromSocial(false);
-
             Member entity = dtoToEntity(dto);
             entity.setPassword(passwordEncoder.encode(dto.getPassword()));
             log.info(entity);

@@ -2,6 +2,7 @@ package net.stockkid.stockkidbe.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import net.stockkid.stockkidbe.dto.AuthDTO;
 import net.stockkid.stockkidbe.dto.MemberDTO;
 import net.stockkid.stockkidbe.dto.ResponseDTO;
 import net.stockkid.stockkidbe.dto.ResponseStatus;
@@ -28,13 +29,14 @@ public class MemberController {
     private final MemberService memberService;
 
     @PostMapping("/signup")
-    public ResponseEntity<ResponseDTO> signup(@RequestBody MemberDTO memberDTO) {
+    public ResponseEntity<ResponseDTO> signup(@RequestBody AuthDTO authDTO) {
 
         log.info("--------------signup--------------");
 
         Pattern pattern = Pattern.compile("^.{6,30}$");
-        Matcher matcherUsername = pattern.matcher(memberDTO.getUsername());
-        Matcher matcherPassword = pattern.matcher(memberDTO.getPassword());
+
+        Matcher matcherUsername = pattern.matcher(authDTO.getUsername());
+        Matcher matcherPassword = pattern.matcher(authDTO.getPassword());
 
         ResponseDTO responseDTO = new ResponseDTO();
         HttpHeaders httpHeaders = new HttpHeaders();
@@ -42,6 +44,10 @@ public class MemberController {
 
         if (matcherUsername.find() && matcherPassword.find()) {
             try {
+                MemberDTO memberDTO = new MemberDTO();
+                memberDTO.setUsername(authDTO.getUsername());
+                memberDTO.setPassword(authDTO.getPassword());
+
                 memberService.createUser(memberDTO);
                 responseDTO.setResponseStatus(ResponseStatus.SIGNUP_OK);
                 responseDTO.setResponseMessage("Signup OK");
@@ -57,9 +63,5 @@ public class MemberController {
             responseDTO.setResponseMessage("Invalid Username/Password");
             return new ResponseEntity<>(responseDTO, httpHeaders, HttpStatus.ACCEPTED);
         }
-
-
-
-
     }
 }

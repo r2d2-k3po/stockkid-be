@@ -1,16 +1,25 @@
 package net.stockkid.stockkidbe.config;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.stockkid.stockkidbe.entity.MemberRole;
+import net.stockkid.stockkidbe.repository.MemberRepository;
+import net.stockkid.stockkidbe.security.filter.ApiCheckFilter;
+import net.stockkid.stockkidbe.security.filter.ApiLoginFilter;
+import net.stockkid.stockkidbe.security.service.UserDetailsServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -22,7 +31,10 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @Configuration
 @EnableWebSecurity
 @Log4j2
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+    private final MemberRepository memberRepository;
 
     @Bean
     static RoleHierarchy roleHierarchy() {
@@ -38,11 +50,13 @@ public class SecurityConfig {
                 .cors(withDefaults())
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/api/member/signup").permitAll()
-                        .requestMatchers("/sample/admin").hasRole("ADMIN")
+                        .requestMatchers("/api/member/login").permitAll()
                         .requestMatchers("/sample/staff").hasRole("STAFF")
                         .requestMatchers("/sample/member").hasRole("USER")
                         .anyRequest().authenticated()
                 )
+                .addFilterBefore(apiCheckFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(apiLoginFilter(), UsernamePasswordAuthenticationFilter.class)
                 .httpBasic(withDefaults())
                 .csrf((csrf) -> csrf.disable());
 
@@ -52,6 +66,27 @@ public class SecurityConfig {
     @Bean
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager() {
+        DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider(passwordEncoder());
+        daoAuthenticationProvider.setUserDetailsService(new UserDetailsServiceImpl(memberRepository));
+        return new ProviderManager(Arrays.asList(daoAuthenticationProvider));
+    }
+
+    @Bean
+    public ApiLoginFilter apiLoginFilter() throws Exception {
+
+        ApiLoginFilter apiLoginFilter = new ApiLoginFilter("/api/member/login");
+        apiLoginFilter.setAuthenticationManager(authenticationManager());
+
+        return apiLoginFilter;
+    }
+
+    @Bean
+    public ApiCheckFilter apiCheckFilter() {
+        return new ApiCheckFilter();
     }
 
     @Bean

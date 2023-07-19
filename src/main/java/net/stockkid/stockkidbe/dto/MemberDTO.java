@@ -1,23 +1,23 @@
 package net.stockkid.stockkidbe.dto;
 
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import net.stockkid.stockkidbe.entity.MemberRole;
 import java.time.LocalDateTime;
 
-@Builder
+@EqualsAndHashCode(callSuper = true)
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class MemberDTO {
+public class MemberDTO extends AuthDTO {
 
     private Long memberId;
-    private String username;
-    private String password;
-    private MemberRole memberRole;
-    private boolean accountNonExpired;
-    private boolean accountNonLocked;
-    private boolean credentialsNonExpired;
-    private boolean enabled;
-    private boolean fromSocial;
+    private MemberRole memberRole = MemberRole.USER;
+    private boolean accountNonExpired = true;
+    private boolean accountNonLocked = true;
+    private boolean credentialsNonExpired = true;
+    private boolean enabled = true;
+    private boolean fromSocial = false;
     private LocalDateTime regDate, modDate;
 }
