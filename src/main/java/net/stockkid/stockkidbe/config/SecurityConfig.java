@@ -6,6 +6,7 @@ import net.stockkid.stockkidbe.entity.MemberRole;
 import net.stockkid.stockkidbe.repository.MemberRepository;
 import net.stockkid.stockkidbe.security.filter.ApiCheckFilter;
 import net.stockkid.stockkidbe.security.filter.ApiLoginFilter;
+import net.stockkid.stockkidbe.security.handler.ApiLoginFailureHandler;
 import net.stockkid.stockkidbe.security.service.UserDetailsServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -80,6 +81,8 @@ public class SecurityConfig {
 
         ApiLoginFilter apiLoginFilter = new ApiLoginFilter("/api/member/login");
         apiLoginFilter.setAuthenticationManager(authenticationManager());
+
+        apiLoginFilter.setAuthenticationFailureHandler(new ApiLoginFailureHandler());
 
         return apiLoginFilter;
     }
