@@ -1,21 +1,34 @@
 package net.stockkid.stockkidbe.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.log4j.Log4j2;
 import net.stockkid.stockkidbe.dto.AuthDTO;
+import net.stockkid.stockkidbe.dto.ResponseDTO;
+import net.stockkid.stockkidbe.dto.ResponseStatus;
+import net.stockkid.stockkidbe.security.util.JWTUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 @Log4j2
 public class ApiLoginFilter extends AbstractAuthenticationProcessingFilter {
+
+    @Autowired
+    private JWTUtil jwtUtil;
+
+
+
     public ApiLoginFilter(String defaultFilterProcessesUrl) {
         super(defaultFilterProcessesUrl);
     }
@@ -38,5 +51,37 @@ public class ApiLoginFilter extends AbstractAuthenticationProcessingFilter {
         UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(authDTO.getUsername(), authDTO.getPassword());
 
         return getAuthenticationManager().authenticate(authToken);
+    }
+
+    @Override
+    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain, Authentication authResult) throws IOException, ServletException {
+
+        log.info("successfulAuthentication : " + authResult);
+        log.info(authResult.getPrincipal());
+
+        String username = ((User) authResult.getPrincipal()).getUsername();
+        //get GrantedAuthority from Collection and remove ROLE_ prefix
+        String role = authResult.getAuthorities().iterator().next().getAuthority().substring(5);
+
+        try {
+            String token = jwtUtil.generateToken(username, role);
+
+            log.info("successful token : " + token);
+
+            response.setStatus(HttpServletResponse.SC_CREATED);
+            response.setContentType("application/json;charset=utf-8");
+
+            ResponseDTO responseDTO = new ResponseDTO();
+            responseDTO.setResponseStatus(ResponseStatus.LOGIN_OK);
+            responseDTO.setResponseMessage("Login OK");
+            responseDTO.setResponseObject(token);
+
+            String jsonBody = new ObjectMapper().writeValueAsString(responseDTO);
+
+            PrintWriter writer = response.getWriter();
+            writer.print(jsonBody);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

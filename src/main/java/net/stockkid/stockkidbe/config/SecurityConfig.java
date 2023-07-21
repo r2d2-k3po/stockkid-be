@@ -58,7 +58,6 @@ public class SecurityConfig {
                 )
                 .addFilterBefore(apiCheckFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(apiLoginFilter(), UsernamePasswordAuthenticationFilter.class)
-                .httpBasic(withDefaults())
                 .csrf((csrf) -> csrf.disable());
 
         return http.build();
