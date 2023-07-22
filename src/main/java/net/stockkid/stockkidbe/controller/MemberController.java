@@ -49,18 +49,18 @@ public class MemberController {
                 memberDTO.setPassword(authDTO.getPassword());
 
                 memberService.createUser(memberDTO);
-                responseDTO.setResponseStatus(ResponseStatus.SIGNUP_OK);
-                responseDTO.setResponseMessage("Signup OK");
+                responseDTO.setApiStatus(ResponseStatus.SIGNUP_OK);
+                responseDTO.setApiMsg("Signup OK");
                 return new ResponseEntity<>(responseDTO, httpHeaders, HttpStatus.CREATED);
             } catch (Exception e) {
                 log.info("Signup Error : " + e.getMessage());
-                responseDTO.setResponseStatus(ResponseStatus.SIGNUP_FAIL);
-                responseDTO.setResponseMessage(e.getMessage());
+                responseDTO.setApiStatus(ResponseStatus.SIGNUP_FAIL);
+                responseDTO.setApiMsg(e.getMessage());
                 return new ResponseEntity<>(responseDTO, httpHeaders, HttpStatus.ACCEPTED);
             }
         } else {
-            responseDTO.setResponseStatus(ResponseStatus.SIGNUP_FAIL);
-            responseDTO.setResponseMessage("Invalid Username/Password");
+            responseDTO.setApiStatus(ResponseStatus.SIGNUP_FAIL);
+            responseDTO.setApiMsg("Invalid Username/Password");
             return new ResponseEntity<>(responseDTO, httpHeaders, HttpStatus.ACCEPTED);
         }
     }

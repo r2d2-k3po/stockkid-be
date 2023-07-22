@@ -72,9 +72,9 @@ public class ApiLoginFilter extends AbstractAuthenticationProcessingFilter {
             response.setContentType("application/json;charset=utf-8");
 
             ResponseDTO responseDTO = new ResponseDTO();
-            responseDTO.setResponseStatus(ResponseStatus.LOGIN_OK);
-            responseDTO.setResponseMessage("Login OK");
-            responseDTO.setResponseObject(token);
+            responseDTO.setApiStatus(ResponseStatus.LOGIN_OK);
+            responseDTO.setApiMsg("Login OK");
+            responseDTO.setApiObj(token);
 
             String jsonBody = new ObjectMapper().writeValueAsString(responseDTO);
 
