@@ -83,7 +83,6 @@ public class JWTUtil {
             jwtClaimsDTO.setRole((String) claims.get("rol"));
             return jwtClaimsDTO;
         } catch (Exception e) {
-            e.printStackTrace();
             log.error(e.getMessage());
             return null;
         }

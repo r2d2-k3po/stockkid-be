@@ -27,8 +27,6 @@ public class ApiLoginFilter extends AbstractAuthenticationProcessingFilter {
     @Autowired
     private JWTUtil jwtUtil;
 
-
-
     public ApiLoginFilter(String defaultFilterProcessesUrl) {
         super(defaultFilterProcessesUrl);
     }
@@ -39,18 +37,23 @@ public class ApiLoginFilter extends AbstractAuthenticationProcessingFilter {
         log.info("ApiLoginFilter------------------------");
         log.info("attemptAuthentication");
 
-        StringBuilder requestBody = new StringBuilder();
-        BufferedReader reader = request.getReader();
-        String line;
-        while ((line = reader.readLine()) != null) {
-            requestBody.append(line);
+        try {
+            StringBuilder requestBody = new StringBuilder();
+            BufferedReader reader = request.getReader();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                requestBody.append(line);
+            }
+            AuthDTO authDTO = new ObjectMapper().readValue(requestBody.toString(), AuthDTO.class);
+            log.info("login_authDTO : " + authDTO);
+
+            UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(authDTO.getUsername(), authDTO.getPassword());
+
+            return getAuthenticationManager().authenticate(authToken);
+        } catch (Exception error) {
+            error.printStackTrace();
         }
-        AuthDTO authDTO = new ObjectMapper().readValue(requestBody.toString(), AuthDTO.class);
-        log.info("login_authDTO : " + authDTO);
-
-        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(authDTO.getUsername(), authDTO.getPassword());
-
-        return getAuthenticationManager().authenticate(authToken);
+        return null;
     }
 
     @Override

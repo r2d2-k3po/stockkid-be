@@ -4,8 +4,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.stockkid.stockkidbe.entity.MemberRole;
 import net.stockkid.stockkidbe.repository.MemberRepository;
-import net.stockkid.stockkidbe.security.filter.ApiCheckFilter;
+import net.stockkid.stockkidbe.security.filter.ApiJWTFilter;
 import net.stockkid.stockkidbe.security.filter.ApiLoginFilter;
+import net.stockkid.stockkidbe.security.handler.ApiJWTFailureHandler;
 import net.stockkid.stockkidbe.security.handler.ApiLoginFailureHandler;
 import net.stockkid.stockkidbe.security.service.UserDetailsServiceImpl;
 import org.springframework.context.annotation.Bean;
@@ -21,6 +22,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -51,12 +53,10 @@ public class SecurityConfig {
                 .cors(withDefaults())
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/api/member/signup").permitAll()
-                        .requestMatchers("/api/member/login").permitAll()
-                        .requestMatchers("/sample/staff").hasRole("STAFF")
-                        .requestMatchers("/sample/member").hasRole("USER")
+                        .requestMatchers("/api/jwt/member/changePassword").hasRole("USER")
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(apiCheckFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(apiJWTFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(apiLoginFilter(), UsernamePasswordAuthenticationFilter.class)
                 .csrf((csrf) -> csrf.disable());
 
@@ -80,15 +80,19 @@ public class SecurityConfig {
 
         ApiLoginFilter apiLoginFilter = new ApiLoginFilter("/api/member/login");
         apiLoginFilter.setAuthenticationManager(authenticationManager());
-
         apiLoginFilter.setAuthenticationFailureHandler(new ApiLoginFailureHandler());
 
         return apiLoginFilter;
     }
 
     @Bean
-    public ApiCheckFilter apiCheckFilter() {
-        return new ApiCheckFilter();
+    public ApiJWTFilter apiJWTFilter() throws Exception {
+
+        ApiJWTFilter apiJWTFilter = new ApiJWTFilter(new AntPathRequestMatcher("api/jwt/**"));
+        apiJWTFilter.setAuthenticationManager(authenticationManager());
+        apiJWTFilter.setAuthenticationFailureHandler(new ApiJWTFailureHandler());
+
+        return apiJWTFilter;
     }
 
     @Bean
