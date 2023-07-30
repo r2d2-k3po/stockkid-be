@@ -6,8 +6,6 @@ import net.stockkid.stockkidbe.entity.MemberRole;
 import net.stockkid.stockkidbe.repository.MemberRepository;
 import net.stockkid.stockkidbe.security.filter.ApiJwtFilter;
 import net.stockkid.stockkidbe.security.filter.ApiLoginFilter;
-import net.stockkid.stockkidbe.security.handler.ApiJwtFailureHandler;
-import net.stockkid.stockkidbe.security.handler.ApiJwtSuccessHandler;
 import net.stockkid.stockkidbe.security.handler.ApiLoginFailureHandler;
 import net.stockkid.stockkidbe.security.service.UserDetailsServiceImpl;
 import org.springframework.context.annotation.Bean;
@@ -88,13 +86,7 @@ public class SecurityConfig {
 
     @Bean
     public ApiJwtFilter apiJwtFilter() throws Exception {
-
-        ApiJwtFilter apiJwtFilter = new ApiJwtFilter(new AntPathRequestMatcher("/api/jwt/**"));
-        apiJwtFilter.setAuthenticationManager(authenticationManager());
-        apiJwtFilter.setAuthenticationSuccessHandler(new ApiJwtSuccessHandler());
-        apiJwtFilter.setAuthenticationFailureHandler(new ApiJwtFailureHandler());
-
-        return apiJwtFilter;
+        return new ApiJwtFilter(new AntPathRequestMatcher("/api/jwt/**"));
     }
 
     @Bean

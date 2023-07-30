@@ -7,6 +7,7 @@ import io.jsonwebtoken.security.Keys;
 import lombok.extern.log4j.Log4j2;
 import net.stockkid.stockkidbe.dto.JWTClaimsDTO;
 import org.springframework.beans.factory.annotation.Value;
+
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
@@ -14,6 +15,7 @@ import java.time.ZonedDateTime;
 import java.util.Base64;
 import java.util.Date;
 import java.security.NoSuchAlgorithmException;
+
 import org.springframework.stereotype.Component;
 
 @Log4j2
@@ -69,22 +71,15 @@ public class JwtUtil {
         SecretKey secretKey = getSecretKeyFromProperties();
 
         JWTClaimsDTO jwtClaimsDTO = new JWTClaimsDTO();
-        Jwt<?, ?> jwt;
+        Jwt<?, ?> jwt = Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(tokenStr);
 
-        try {
-            jwt = Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(tokenStr);
+        log.info(jwt);
+        log.info(jwt.getBody().getClass());
 
-            log.info(jwt);
-            log.info(jwt.getBody().getClass());
+        DefaultClaims claims = (DefaultClaims) jwt.getBody();
 
-            DefaultClaims claims = (DefaultClaims) jwt.getBody();
-
-            jwtClaimsDTO.setUsername(claims.getSubject());
-            jwtClaimsDTO.setRole((String) claims.get("rol"));
-            return jwtClaimsDTO;
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            return null;
-        }
+        jwtClaimsDTO.setUsername(claims.getSubject());
+        jwtClaimsDTO.setRole((String) claims.get("rol"));
+        return jwtClaimsDTO;
     }
 }

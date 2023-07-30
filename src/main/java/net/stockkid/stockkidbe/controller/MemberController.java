@@ -64,7 +64,6 @@ public class MemberController {
     public ResponseEntity<ResponseDTO> changePassword(@RequestBody PasswordDTO passwordDTO) {
 
         log.info("--------------changePassword--------------");
-        log.info("--------------changePassword--------------");
 
         Pattern pattern = Pattern.compile("^.{6,30}$");
 
@@ -78,7 +77,7 @@ public class MemberController {
             try {
                 memberService.changePassword(passwordDTO.getOldPassword(), passwordDTO.getNewPassword());
                 responseDTO.setApiStatus(ResponseStatus.PW_CH_OK);
-                responseDTO.setApiMsg("Signup OK");
+                responseDTO.setApiMsg("PW_CH OK");
                 return new ResponseEntity<>(responseDTO, httpHeaders, HttpStatus.OK);
             } catch (Exception e) {
                 log.info("Password change Error : " + e.getMessage());
