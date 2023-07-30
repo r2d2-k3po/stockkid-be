@@ -4,9 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.stockkid.stockkidbe.entity.MemberRole;
 import net.stockkid.stockkidbe.repository.MemberRepository;
-import net.stockkid.stockkidbe.security.filter.ApiJWTFilter;
+import net.stockkid.stockkidbe.security.filter.ApiJwtFilter;
 import net.stockkid.stockkidbe.security.filter.ApiLoginFilter;
-import net.stockkid.stockkidbe.security.handler.ApiJWTFailureHandler;
+import net.stockkid.stockkidbe.security.handler.ApiJwtFailureHandler;
+import net.stockkid.stockkidbe.security.handler.ApiJwtSuccessHandler;
 import net.stockkid.stockkidbe.security.handler.ApiLoginFailureHandler;
 import net.stockkid.stockkidbe.security.service.UserDetailsServiceImpl;
 import org.springframework.context.annotation.Bean;
@@ -56,7 +57,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/jwt/member/changePassword").hasRole("USER")
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(apiJWTFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(apiJwtFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(apiLoginFilter(), UsernamePasswordAuthenticationFilter.class)
                 .csrf((csrf) -> csrf.disable());
 
@@ -86,13 +87,14 @@ public class SecurityConfig {
     }
 
     @Bean
-    public ApiJWTFilter apiJWTFilter() throws Exception {
+    public ApiJwtFilter apiJwtFilter() throws Exception {
 
-        ApiJWTFilter apiJWTFilter = new ApiJWTFilter(new AntPathRequestMatcher("api/jwt/**"));
-        apiJWTFilter.setAuthenticationManager(authenticationManager());
-        apiJWTFilter.setAuthenticationFailureHandler(new ApiJWTFailureHandler());
+        ApiJwtFilter apiJwtFilter = new ApiJwtFilter(new AntPathRequestMatcher("/api/jwt/**"));
+        apiJwtFilter.setAuthenticationManager(authenticationManager());
+        apiJwtFilter.setAuthenticationSuccessHandler(new ApiJwtSuccessHandler());
+        apiJwtFilter.setAuthenticationFailureHandler(new ApiJwtFailureHandler());
 
-        return apiJWTFilter;
+        return apiJwtFilter;
     }
 
     @Bean

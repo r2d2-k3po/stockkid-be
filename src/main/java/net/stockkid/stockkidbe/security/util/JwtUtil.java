@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 
 @Log4j2
 @Component
-public class JWTUtil {
+public class JwtUtil {
 
     @Value("${jwt.base64EncodedSecretKey}")
     private String base64EncodedSecretKey;
@@ -59,7 +59,7 @@ public class JWTUtil {
                 .claim("rol", rol)
                 .setIssuedAt(new Date())
                 .setExpiration(Date.from(ZonedDateTime.now().plusMinutes(sevenDaysInMinutes).toInstant()))
-//                .setExpiration(Date.from(ZonedDateTime.now().plusSeconds(1).toInstant()))
+//                .setExpiration(Date.from(ZonedDateTime.now().plusSeconds(180).toInstant()))
                 .signWith(secretKey)
                 .compact();
     }

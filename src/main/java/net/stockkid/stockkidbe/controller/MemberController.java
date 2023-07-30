@@ -3,15 +3,13 @@ package net.stockkid.stockkidbe.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.stockkid.stockkidbe.dto.*;
+import net.stockkid.stockkidbe.dto.ResponseStatus;
 import net.stockkid.stockkidbe.service.MemberService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.nio.charset.StandardCharsets;
 import java.util.regex.Matcher;
@@ -62,9 +60,10 @@ public class MemberController {
         }
     }
 
-    @PostMapping("/jwt/member/changePassword")
+    @PatchMapping("/jwt/member/changePassword")
     public ResponseEntity<ResponseDTO> changePassword(@RequestBody PasswordDTO passwordDTO) {
 
+        log.info("--------------changePassword--------------");
         log.info("--------------changePassword--------------");
 
         Pattern pattern = Pattern.compile("^.{6,30}$");

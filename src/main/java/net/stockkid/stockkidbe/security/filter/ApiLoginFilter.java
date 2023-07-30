@@ -9,7 +9,7 @@ import lombok.extern.log4j.Log4j2;
 import net.stockkid.stockkidbe.dto.AuthDTO;
 import net.stockkid.stockkidbe.dto.ResponseDTO;
 import net.stockkid.stockkidbe.dto.ResponseStatus;
-import net.stockkid.stockkidbe.security.util.JWTUtil;
+import net.stockkid.stockkidbe.security.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -25,7 +25,7 @@ import java.io.PrintWriter;
 public class ApiLoginFilter extends AbstractAuthenticationProcessingFilter {
 
     @Autowired
-    private JWTUtil jwtUtil;
+    private JwtUtil jwtUtil;
 
     public ApiLoginFilter(String defaultFilterProcessesUrl) {
         super(defaultFilterProcessesUrl);
@@ -45,7 +45,6 @@ public class ApiLoginFilter extends AbstractAuthenticationProcessingFilter {
                 requestBody.append(line);
             }
             AuthDTO authDTO = new ObjectMapper().readValue(requestBody.toString(), AuthDTO.class);
-            log.info("login_authDTO : " + authDTO);
 
             UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(authDTO.getUsername(), authDTO.getPassword());
 

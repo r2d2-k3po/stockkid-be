@@ -1,7 +1,7 @@
 package net.stockkid.stockkidbe.security;
 
 import net.stockkid.stockkidbe.dto.JWTClaimsDTO;
-import net.stockkid.stockkidbe.security.util.JWTUtil;
+import net.stockkid.stockkidbe.security.util.JwtUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -10,13 +10,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 public class JWTTests {
 
     @Autowired
-    private JWTUtil jwtUtil;
+    private JwtUtil jwtUtil;
 
     //get a key and save it in application.properties
     @Test
     public void generateBase64EncodedSecretKey() throws Exception {
 
-        String base64EncodedSecretKey = JWTUtil.getBase64EncodedSecretKey();
+        String base64EncodedSecretKey = JwtUtil.getBase64EncodedSecretKey();
 
         System.out.println("base64EncodedSecretKey : " + base64EncodedSecretKey);
     }
