@@ -13,9 +13,9 @@ public interface MemberService {
 
     void changePassword(String oldPassword, String newPassword);
 
+    void disableUser(String password);
+
     boolean userExists(String username);
-
-
 
     default Member dtoToEntity(MemberDTO dto) {
         return Member.builder()

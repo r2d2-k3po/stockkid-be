@@ -91,6 +91,22 @@ public class MemberServiceImpl implements MemberService {
         }
     }
 
+    //USER
+    @Override
+    public void disableUser(String password) throws UsernameNotFoundException, BadCredentialsException {
+
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Optional<Member> optionalUser = memberRepository.findByUsername(username);
+        Member existingUser = optionalUser.orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        if (passwordEncoder.matches(password, existingUser.getPassword())) {
+            existingUser.setEnabled(false);
+            memberRepository.save(existingUser);
+        } else {
+            throw new BadCredentialsException("Bad Credentials Exception");
+        }
+    }
+
     @Override
     public boolean userExists(String username) {
 

@@ -91,4 +91,26 @@ public class MemberController {
             return new ResponseEntity<>(responseDTO, httpHeaders, HttpStatus.BAD_REQUEST);
         }
     }
+
+    @PatchMapping("/jwt/member/deleteAccount")
+    public ResponseEntity<ResponseDTO> deleteAccount(@RequestBody AuthDTO authDTO) {
+
+        log.info("--------------deleteAccount--------------");
+
+        ResponseDTO responseDTO = new ResponseDTO();
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
+
+        try {
+            memberService.disableUser(authDTO.getPassword());
+            responseDTO.setApiStatus(ResponseStatus.AC_DL_OK);
+            responseDTO.setApiMsg("AC_DL OK");
+            return new ResponseEntity<>(responseDTO, httpHeaders, HttpStatus.OK);
+        } catch (Exception e) {
+            log.info("Account delete Error : " + e.getMessage());
+            responseDTO.setApiStatus(ResponseStatus.AC_DL_FAIL);
+            responseDTO.setApiMsg(e.getMessage());
+            return new ResponseEntity<>(responseDTO, httpHeaders, HttpStatus.FORBIDDEN);
+        }
+    }
 }

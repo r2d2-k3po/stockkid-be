@@ -53,6 +53,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/api/member/signup").permitAll()
                         .requestMatchers("/api/jwt/member/changePassword").hasRole("USER")
+                        .requestMatchers("/api/jwt/member/deleteAccount").hasRole("USER")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(apiJwtFilter(), UsernamePasswordAuthenticationFilter.class)

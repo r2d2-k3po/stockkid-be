@@ -37,22 +37,17 @@ public class ApiLoginFilter extends AbstractAuthenticationProcessingFilter {
         log.info("ApiLoginFilter------------------------");
         log.info("attemptAuthentication");
 
-        try {
-            StringBuilder requestBody = new StringBuilder();
-            BufferedReader reader = request.getReader();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                requestBody.append(line);
-            }
-            AuthDTO authDTO = new ObjectMapper().readValue(requestBody.toString(), AuthDTO.class);
-
-            UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(authDTO.getUsername(), authDTO.getPassword());
-
-            return getAuthenticationManager().authenticate(authToken);
-        } catch (Exception error) {
-            error.printStackTrace();
+        StringBuilder requestBody = new StringBuilder();
+        BufferedReader reader = request.getReader();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            requestBody.append(line);
         }
-        return null;
+        AuthDTO authDTO = new ObjectMapper().readValue(requestBody.toString(), AuthDTO.class);
+
+        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(authDTO.getUsername(), authDTO.getPassword());
+
+        return getAuthenticationManager().authenticate(authToken);
     }
 
     @Override
@@ -83,7 +78,7 @@ public class ApiLoginFilter extends AbstractAuthenticationProcessingFilter {
             PrintWriter writer = response.getWriter();
             writer.print(jsonBody);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.info(e.getMessage());
         }
     }
 }
