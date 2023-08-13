@@ -1,0 +1,154 @@
+package net.stockkid.stockkidbe.security.filter;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeTokenRequest;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
+import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.json.gson.GsonFactory;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.log4j.Log4j2;
+import net.stockkid.stockkidbe.dto.*;
+import net.stockkid.stockkidbe.entity.MemberRole;
+import net.stockkid.stockkidbe.entity.MemberSocial;
+import net.stockkid.stockkidbe.security.util.JwtUtil;
+import net.stockkid.stockkidbe.service.MemberService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+import java.io.BufferedReader;
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.security.SecureRandom;
+import java.util.Collections;
+
+@Log4j2
+public class ApiGoogleFilter extends OncePerRequestFilter {
+
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    @Value("${spring.security.oauth2.client.registration.google.client-id}")
+    private String googleClientId;
+
+    @Value("${spring.security.oauth2.client.registration.google.client-secret}")
+    private String googleClientSecret;
+
+    private final AntPathRequestMatcher antPathRequestMatcher;
+
+    private final MemberService memberService;
+
+    public ApiGoogleFilter(AntPathRequestMatcher antPathRequestMatcher, MemberService memberService) {
+        this.antPathRequestMatcher = antPathRequestMatcher;
+        this.memberService = memberService;
+    }
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+
+        if (antPathRequestMatcher.matches(request)) {
+            log.info("ApiGoogleFilter---------------------");
+
+            try {
+                StringBuilder requestBody = new StringBuilder();
+                BufferedReader reader = request.getReader();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    requestBody.append(line);
+                }
+                AuthcodeDTO authcodeDTO = new ObjectMapper().readValue(requestBody.toString(), AuthcodeDTO.class);
+
+                log.info("authcode: " + authcodeDTO.getAuthcode());
+                log.info("googleClientId: " + googleClientId);
+
+                GoogleTokenResponse googleTokenResponse = new GoogleAuthorizationCodeTokenRequest(
+                        new NetHttpTransport(), new GsonFactory(),
+                        googleClientId, googleClientSecret,
+                        authcodeDTO.getAuthcode(), "postmessage")
+                        .execute();
+
+                log.info("Id token: " + googleTokenResponse.getIdToken());
+
+                GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
+                        .setAudience(Collections.singletonList(googleClientId))
+                        .build();
+
+                GoogleIdToken idToken = verifier.verify(googleTokenResponse.getIdToken());
+                if (idToken == null) {
+                    throw new Exception("Invalid ID token.");
+                }
+
+                GoogleIdToken.Payload payload = idToken.getPayload();
+                String email = payload.getEmail();
+                boolean emailVerified = payload.getEmailVerified();
+                log.info("email : " + email);
+                log.info(emailVerified);
+                if (!emailVerified) {
+                    throw new Exception("Email not verified.");
+                }
+
+                MemberDTO memberDTO = memberService.loadUserByUsername(email);
+                if (memberDTO == null) {
+                    String token = jwtUtil.generateToken(email, MemberRole.USER.name(), MemberSocial.GGL.name());
+
+//                    MemberDTO newMemberDTO = new MemberDTO();
+//                    newMemberDTO.setUsername(email);
+//                    newMemberDTO.setPassword(generateRandomPassword(30));
+//                    newMemberDTO.setFromSocial(MemberSocial.GGL);
+
+                } else if (memberDTO.getFromSocial() == MemberSocial.GGL) {
+                    String token = jwtUtil.generateToken(email, memberDTO.getMemberRole().name(), MemberSocial.GGL.name());
+
+                } else {
+                    throw new Exception("User already exists");
+                }
+
+
+
+                filterChain.doFilter(request, response);
+                return;
+            } catch (Exception error) {
+                log.info(error.getMessage());
+
+                response.setStatus(HttpServletResponse.SC_CONFLICT);
+                response.setContentType("application/json;charset=utf-8");
+
+                ResponseDTO responseDTO = new ResponseDTO();
+                responseDTO.setApiStatus(ResponseStatus.LOGIN_FAIL);
+                responseDTO.setApiMsg(error.getMessage());
+
+                String jsonBody = new ObjectMapper().writeValueAsString(responseDTO);
+
+                PrintWriter writer = response.getWriter();
+                writer.print(jsonBody);
+            }
+            return;
+        }
+        filterChain.doFilter(request, response);
+    }
+
+    private String generateRandomPassword(int length) {
+
+        String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+";
+        StringBuilder password = new StringBuilder();
+        SecureRandom random = new SecureRandom();
+
+        for (int i = 0; i < length; i++) {
+            int randomIndex = random.nextInt(CHARACTERS.length());
+            char randomChar = CHARACTERS.charAt(randomIndex);
+            password.append(randomChar);
+        }
+        return password.toString();
+    }
+}

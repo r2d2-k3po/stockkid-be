@@ -51,7 +51,7 @@ public class JwtUtil {
         return null;
     }
 
-    public String generateToken(String sub, String rol) throws Exception {
+    public String generateToken(String sub, String rol, String soc) throws Exception {
 
         long sevenDaysInMinutes = 60 * 24 * 7;
         SecretKey secretKey = getSecretKeyFromProperties();
@@ -59,6 +59,7 @@ public class JwtUtil {
         return Jwts.builder()
                 .setSubject(sub)
                 .claim("rol", rol)
+                .claim("soc", soc)
                 .setIssuedAt(new Date())
                 .setExpiration(Date.from(ZonedDateTime.now().plusMinutes(sevenDaysInMinutes).toInstant()))
 //                .setExpiration(Date.from(ZonedDateTime.now().plusSeconds(180).toInstant()))
@@ -80,6 +81,7 @@ public class JwtUtil {
 
         jwtClaimsDTO.setUsername(claims.getSubject());
         jwtClaimsDTO.setRole((String) claims.get("rol"));
+        jwtClaimsDTO.setSocial((String) claims.get("soc"));
         return jwtClaimsDTO;
     }
 }

@@ -4,10 +4,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.stockkid.stockkidbe.entity.MemberRole;
 import net.stockkid.stockkidbe.repository.MemberRepository;
+import net.stockkid.stockkidbe.security.filter.ApiGoogleFilter;
 import net.stockkid.stockkidbe.security.filter.ApiJwtFilter;
 import net.stockkid.stockkidbe.security.filter.ApiLoginFilter;
 import net.stockkid.stockkidbe.security.handler.ApiLoginFailureHandler;
 import net.stockkid.stockkidbe.security.service.UserDetailsServiceImpl;
+import net.stockkid.stockkidbe.service.MemberServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
@@ -27,6 +29,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -52,13 +55,14 @@ public class SecurityConfig {
                 .cors(withDefaults())
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/api/member/signup").permitAll()
-                        .requestMatchers("/api/member/googleSignin").permitAll()
+                        .requestMatchers("/api/google/member/signin").permitAll()
                         .requestMatchers("/api/jwt/member/changePassword").hasRole("USER")
                         .requestMatchers("/api/jwt/member/deleteAccount").hasRole("USER")
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(apiJwtFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(apiLoginFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(apiGoogleFilter(), UsernamePasswordAuthenticationFilter.class)
                 .csrf((csrf) -> csrf.disable());
 
         return http.build();
@@ -73,7 +77,7 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager() {
         DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider(passwordEncoder());
         daoAuthenticationProvider.setUserDetailsService(new UserDetailsServiceImpl(memberRepository));
-        return new ProviderManager(Arrays.asList(daoAuthenticationProvider));
+        return new ProviderManager(List.of(daoAuthenticationProvider));
     }
 
     @Bean
@@ -92,9 +96,14 @@ public class SecurityConfig {
     }
 
     @Bean
+    public ApiGoogleFilter apiGoogleFilter() throws Exception {
+        return new ApiGoogleFilter(new AntPathRequestMatcher("/api/google/**"), new MemberServiceImpl(memberRepository, passwordEncoder()));
+    }
+
+    @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000/"));
+        configuration.setAllowedOrigins(List.of("http://localhost:3000/"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE"));
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);

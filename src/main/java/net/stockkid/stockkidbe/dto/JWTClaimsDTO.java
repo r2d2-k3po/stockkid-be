@@ -10,4 +10,5 @@ import lombok.NoArgsConstructor;
 public class JWTClaimsDTO {
     private String username;
     private String role;
+    private String social;
 }

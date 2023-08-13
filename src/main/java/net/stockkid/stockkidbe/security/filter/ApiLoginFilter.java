@@ -9,6 +9,7 @@ import lombok.extern.log4j.Log4j2;
 import net.stockkid.stockkidbe.dto.AuthDTO;
 import net.stockkid.stockkidbe.dto.ResponseDTO;
 import net.stockkid.stockkidbe.dto.ResponseStatus;
+import net.stockkid.stockkidbe.entity.MemberSocial;
 import net.stockkid.stockkidbe.security.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -61,7 +62,7 @@ public class ApiLoginFilter extends AbstractAuthenticationProcessingFilter {
         String role = authResult.getAuthorities().iterator().next().getAuthority().substring(5);
 
         try {
-            String token = jwtUtil.generateToken(username, role);
+            String token = jwtUtil.generateToken(username, role, MemberSocial.UP.name());
 
             log.info("successful token : " + token);
 

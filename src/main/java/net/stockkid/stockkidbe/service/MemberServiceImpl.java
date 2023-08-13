@@ -59,7 +59,7 @@ public class MemberServiceImpl implements MemberService {
         existingUser.setAccountNonLocked(dto.isAccountNonLocked());
         existingUser.setCredentialsNonExpired(dto.isCredentialsNonExpired());
         existingUser.setEnabled(dto.isEnabled());
-        existingUser.setFromSocial(dto.isFromSocial());
+        existingUser.setFromSocial(dto.getFromSocial());
 
         memberRepository.save(existingUser);
     }
@@ -111,6 +111,17 @@ public class MemberServiceImpl implements MemberService {
     public boolean userExists(String username) {
 
         return memberRepository.existsByUsername(username);
+    }
+
+    @Override
+    public MemberDTO loadUserByUsername(String username) {
+
+        Optional<Member> result = memberRepository.findByUsername(username);
+        if (result.isEmpty()) {
+            return null;
+        }
+        Member entity = result.get();
+        return entityToDto(entity);
     }
 
 // STAFF

@@ -3,6 +3,8 @@ package net.stockkid.stockkidbe.dto;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import net.stockkid.stockkidbe.entity.MemberRole;
+import net.stockkid.stockkidbe.entity.MemberSocial;
+
 import java.time.LocalDateTime;
 
 @EqualsAndHashCode(callSuper = true)
@@ -18,6 +20,6 @@ public class MemberDTO extends AuthDTO {
     private boolean accountNonLocked = true;
     private boolean credentialsNonExpired = true;
     private boolean enabled = true;
-    private boolean fromSocial = false;
+    private MemberSocial fromSocial = MemberSocial.UP;
     private LocalDateTime regDate, modDate;
 }

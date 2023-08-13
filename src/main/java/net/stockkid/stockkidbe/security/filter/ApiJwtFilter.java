@@ -42,8 +42,7 @@ public class ApiJwtFilter extends OncePerRequestFilter {
         log.info("matches : " + antPathRequestMatcher.matches(request));
 
         if (antPathRequestMatcher.matches(request)) {
-            log.info("ApiJWTFilter---------------------");
-            log.info("ApiJWTFilter---------------------");
+            log.info("ApiJwtFilter---------------------");
 
             try {
                 String token = extractTokenFromHeader(request);

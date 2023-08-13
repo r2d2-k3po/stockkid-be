@@ -25,8 +25,9 @@ public class JWTTests {
     public void testEncode() throws Exception {
         String username = "jwtTestUser";
         String role = "USER";
+        String social = "UP";
 
-        String token = jwtUtil.generateToken(username, role);
+        String token = jwtUtil.generateToken(username, role, social);
 
         System.out.println("token : " + token);
     }
@@ -36,7 +37,8 @@ public class JWTTests {
 
         String username = "jwtTestUser";
         String role = "USER";
-        String token = jwtUtil.generateToken(username, role);
+        String social = "UP";
+        String token = jwtUtil.generateToken(username, role, social);
 
         Thread.sleep(5000);
 

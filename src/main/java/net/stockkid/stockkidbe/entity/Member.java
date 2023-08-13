@@ -26,6 +26,10 @@ public class Member extends BaseEntity {
     private @Setter MemberRole memberRole;
 
     @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private @Setter MemberSocial fromSocial;
+
+    @Column(nullable = false)
     private @Setter boolean accountNonExpired;
 
     @Column(nullable = false)
@@ -36,7 +40,4 @@ public class Member extends BaseEntity {
 
     @Column(nullable = false)
     private @Setter boolean enabled;
-
-    @Column(nullable = false)
-    private @Setter boolean fromSocial;
 }

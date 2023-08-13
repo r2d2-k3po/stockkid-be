@@ -40,7 +40,7 @@ public class MemberController {
     @Value("${spring.security.oauth2.client.registration.google.client-secret}")
     private String googleClientSecret;
 
-    @PostMapping("/member/signup")
+    @PostMapping({"/member/signup", "/google/member/signin"})
     public ResponseEntity<ResponseDTO> signup(@RequestBody AuthDTO authDTO) {
 
         log.info("--------------signup--------------");
@@ -96,29 +96,24 @@ public class MemberController {
                     authcodeDTO.getAuthcode(),"postmessage")
                     .execute();
 
-            log.info("after execute");
-            log.info("Access token: " + response.getAccessToken());
+            log.info("access " + response.getAccessToken());
             log.info("Id token: " + response.getIdToken());
 
-//            GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
-//                    .setAudience(Collections.singletonList(googleClientId))
-//                    .build();
-//
-//            GoogleIdToken idToken = verifier.verify(response.getIdToken());
-//
-//            if (idToken != null) {
-//                Payload payload = idToken.getPayload();
-//                String userId = payload.getSubject();
-//                log.info("User ID: " + userId);
-//
-//                // Get profile information from payload
-//                String email = payload.getEmail();
-//                boolean emailVerified = payload.getEmailVerified();
-//                log.info("email : " + email);
-//                log.info(emailVerified);
-//            } else {
-//                throw new Exception("Invalid ID token.");
-//            }
+            GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
+                    .setAudience(Collections.singletonList(googleClientId))
+                    .build();
+
+            GoogleIdToken idToken = verifier.verify(response.getIdToken());
+
+            if (idToken != null) {
+                Payload payload = idToken.getPayload();
+                String email = payload.getEmail();
+                boolean emailVerified = payload.getEmailVerified();
+                log.info("email : " + email);
+                log.info(emailVerified);
+            } else {
+                throw new Exception("Invalid ID token.");
+            }
 
 //            MemberDTO memberDTO = new MemberDTO();
 //            memberDTO.setUsername(authDTO.getUsername());
