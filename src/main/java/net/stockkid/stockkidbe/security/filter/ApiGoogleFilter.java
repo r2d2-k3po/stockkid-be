@@ -19,15 +19,10 @@ import net.stockkid.stockkidbe.security.util.JwtUtil;
 import net.stockkid.stockkidbe.service.MemberService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.BufferedReader;
-import java.io.EOFException;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.security.SecureRandom;
@@ -98,31 +93,45 @@ public class ApiGoogleFilter extends OncePerRequestFilter {
                     throw new Exception("Email not verified.");
                 }
 
+                response.setContentType("application/json;charset=utf-8");
+
                 MemberDTO memberDTO = memberService.loadUserByUsername(email);
                 if (memberDTO == null) {
                     String token = jwtUtil.generateToken(email, MemberRole.USER.name(), MemberSocial.GGL.name());
 
-//                    MemberDTO newMemberDTO = new MemberDTO();
-//                    newMemberDTO.setUsername(email);
-//                    newMemberDTO.setPassword(generateRandomPassword(30));
-//                    newMemberDTO.setFromSocial(MemberSocial.GGL);
+                    log.info("successful signup token : " + token);
 
+                    MemberDTO newMemberDTO = new MemberDTO();
+                    newMemberDTO.setUsername(email);
+                    newMemberDTO.setPassword(generateRandomPassword(30));
+                    newMemberDTO.setFromSocial(MemberSocial.GGL);
+
+                    memberService.createUser(newMemberDTO);
+
+                    response.setStatus(HttpServletResponse.SC_CREATED);
+                    ResponseDTO responseDTO = new ResponseDTO(ResponseStatus.LOGIN_OK, "Login OK", token);
+                    String jsonBody = new ObjectMapper().writeValueAsString(responseDTO);
+                    PrintWriter writer = response.getWriter();
+                    writer.print(jsonBody);
+                    return;
                 } else if (memberDTO.getFromSocial() == MemberSocial.GGL) {
                     String token = jwtUtil.generateToken(email, memberDTO.getMemberRole().name(), MemberSocial.GGL.name());
 
+                    log.info("successful token : " + token);
+
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    ResponseDTO responseDTO = new ResponseDTO(ResponseStatus.LOGIN_OK, "Login OK", token);
+                    String jsonBody = new ObjectMapper().writeValueAsString(responseDTO);
+                    PrintWriter writer = response.getWriter();
+                    writer.print(jsonBody);
+                    return;
                 } else {
                     throw new Exception("User already exists");
                 }
-
-
-
-                filterChain.doFilter(request, response);
-                return;
             } catch (Exception error) {
                 log.info(error.getMessage());
 
                 response.setStatus(HttpServletResponse.SC_CONFLICT);
-                response.setContentType("application/json;charset=utf-8");
 
                 ResponseDTO responseDTO = new ResponseDTO();
                 responseDTO.setApiStatus(ResponseStatus.LOGIN_FAIL);
