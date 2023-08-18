@@ -108,6 +108,15 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    public void disableSocialUser(Long memberId) throws IllegalArgumentException {
+        Optional<Member> optionalUser = memberRepository.findById(memberId);
+        Member existingUser = optionalUser.orElseThrow(() -> new IllegalArgumentException("memberId not found"));
+
+        existingUser.setEnabled(false);
+        memberRepository.save(existingUser);
+    }
+
+    @Override
     public boolean userExists(String username) {
 
         return memberRepository.existsByUsername(username);

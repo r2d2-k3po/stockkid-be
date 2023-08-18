@@ -15,6 +15,8 @@ public interface MemberService {
 
     void disableUser(String password);
 
+    void disableSocialUser(Long memberId);
+
     boolean userExists(String username);
 
     MemberDTO loadUserByUsername(String username);

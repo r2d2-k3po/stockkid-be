@@ -2,6 +2,7 @@ package net.stockkid.stockkidbe.repository;
 
 import net.stockkid.stockkidbe.entity.Member;
 import net.stockkid.stockkidbe.entity.MemberRole;
+import net.stockkid.stockkidbe.entity.MemberSocial;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -37,7 +38,7 @@ public class MemberRepositoryTests {
                     .accountNonLocked(true)
                     .credentialsNonExpired(true)
                     .enabled(true)
-                    .fromSocial(false)
+                    .fromSocial(MemberSocial.UP)
                     .build();
             memberRepository.save(member);
         });

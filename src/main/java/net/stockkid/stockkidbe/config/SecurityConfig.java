@@ -55,7 +55,6 @@ public class SecurityConfig {
                 .cors(withDefaults())
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/api/member/signup").permitAll()
-                        .requestMatchers("/api/google/member/signin").permitAll()
                         .requestMatchers("/api/jwt/member/changePassword").hasRole("USER")
                         .requestMatchers("/api/jwt/member/deleteAccount").hasRole("USER")
                         .anyRequest().authenticated()

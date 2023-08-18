@@ -96,9 +96,9 @@ public class ApiGoogleFilter extends OncePerRequestFilter {
                 response.setContentType("application/json;charset=utf-8");
 
                 MemberDTO memberDTO = memberService.loadUserByUsername(email);
+
                 if (memberDTO == null) {
                     String token = jwtUtil.generateToken(email, MemberRole.USER.name(), MemberSocial.GGL.name());
-
                     log.info("successful signup token : " + token);
 
                     MemberDTO newMemberDTO = new MemberDTO();
@@ -115,15 +115,31 @@ public class ApiGoogleFilter extends OncePerRequestFilter {
                     writer.print(jsonBody);
                     return;
                 } else if (memberDTO.getFromSocial() == MemberSocial.GGL) {
-                    String token = jwtUtil.generateToken(email, memberDTO.getMemberRole().name(), MemberSocial.GGL.name());
+                    if (!memberDTO.isEnabled()) throw new Exception("User disabled");
+                    if (!memberDTO.isAccountNonExpired()) throw new Exception("Account expired");
+                    if (!memberDTO.isCredentialsNonExpired()) throw new Exception("Credential expired");
+                    if (!memberDTO.isAccountNonLocked()) throw new Exception("Account locked");
 
-                    log.info("successful token : " + token);
+                    if (new AntPathRequestMatcher("/api/google/member/signin").matches(request)) {
+                        String token = jwtUtil.generateToken(email, memberDTO.getMemberRole().name(), MemberSocial.GGL.name());
+                        log.info("successful token : " + token);
 
-                    response.setStatus(HttpServletResponse.SC_OK);
-                    ResponseDTO responseDTO = new ResponseDTO(ResponseStatus.LOGIN_OK, "Login OK", token);
-                    String jsonBody = new ObjectMapper().writeValueAsString(responseDTO);
-                    PrintWriter writer = response.getWriter();
-                    writer.print(jsonBody);
+                        response.setStatus(HttpServletResponse.SC_OK);
+                        ResponseDTO responseDTO = new ResponseDTO(ResponseStatus.LOGIN_OK, "Login OK", token);
+                        String jsonBody = new ObjectMapper().writeValueAsString(responseDTO);
+                        PrintWriter writer = response.getWriter();
+                        writer.print(jsonBody);
+                    } else if (new AntPathRequestMatcher("/api/google/member/deleteAccount").matches(request)) {
+                        memberDTO.setEnabled(false);
+                        memberService.disableSocialUser(memberDTO.getMemberId());
+
+                        ResponseDTO responseDTO = new ResponseDTO();
+                        responseDTO.setApiStatus(ResponseStatus.AC_DL_OK);
+                        responseDTO.setApiMsg("AC_DL OK");
+                        String jsonBody = new ObjectMapper().writeValueAsString(responseDTO);
+                        PrintWriter writer = response.getWriter();
+                        writer.print(jsonBody);
+                    }
                     return;
                 } else {
                     throw new Exception("User already exists");
@@ -134,7 +150,11 @@ public class ApiGoogleFilter extends OncePerRequestFilter {
                 response.setStatus(HttpServletResponse.SC_CONFLICT);
 
                 ResponseDTO responseDTO = new ResponseDTO();
-                responseDTO.setApiStatus(ResponseStatus.LOGIN_FAIL);
+                if (new AntPathRequestMatcher("/api/google/member/signin").matches(request)) {
+                    responseDTO.setApiStatus(ResponseStatus.LOGIN_FAIL);
+                } else if (new AntPathRequestMatcher("/api/google/member/deleteAccount").matches(request)) {
+                    responseDTO.setApiStatus(ResponseStatus.AC_DL_FAIL);
+                }
                 responseDTO.setApiMsg(error.getMessage());
 
                 String jsonBody = new ObjectMapper().writeValueAsString(responseDTO);
