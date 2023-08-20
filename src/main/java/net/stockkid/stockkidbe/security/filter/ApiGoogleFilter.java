@@ -1,6 +1,5 @@
 package net.stockkid.stockkidbe.security.filter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeTokenRequest;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
@@ -15,6 +14,7 @@ import lombok.extern.log4j.Log4j2;
 import net.stockkid.stockkidbe.dto.*;
 import net.stockkid.stockkidbe.entity.MemberRole;
 import net.stockkid.stockkidbe.entity.MemberSocial;
+import net.stockkid.stockkidbe.security.util.IoUtil;
 import net.stockkid.stockkidbe.security.util.TokenUtil;
 import net.stockkid.stockkidbe.service.MemberService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,9 +22,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.security.SecureRandom;
 import java.util.Collections;
 
@@ -33,6 +31,9 @@ public class ApiGoogleFilter extends OncePerRequestFilter {
 
     @Autowired
     private TokenUtil tokenUtil;
+
+    @Autowired
+    private IoUtil ioUtil;
 
     @Value("${spring.security.oauth2.client.registration.google.client-id}")
     private String googleClientId;
@@ -56,13 +57,7 @@ public class ApiGoogleFilter extends OncePerRequestFilter {
             log.info("ApiGoogleFilter---------------------");
 
             try {
-                StringBuilder requestBody = new StringBuilder();
-                BufferedReader reader = request.getReader();
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    requestBody.append(line);
-                }
-                AuthcodeDTO authcodeDTO = new ObjectMapper().readValue(requestBody.toString(), AuthcodeDTO.class);
+                AuthcodeDTO authcodeDTO = ioUtil.readRequestBody(request, AuthcodeDTO.class);
 
                 log.info("authcode: " + authcodeDTO.getAuthcode());
 
@@ -92,8 +87,6 @@ public class ApiGoogleFilter extends OncePerRequestFilter {
                     throw new Exception("Email not verified.");
                 }
 
-                response.setContentType("application/json;charset=utf-8");
-
                 MemberDTO memberDTO = memberService.loadUserByUsername(email);
 
                 if (memberDTO == null) {
@@ -108,11 +101,11 @@ public class ApiGoogleFilter extends OncePerRequestFilter {
 
                     response.setStatus(HttpServletResponse.SC_CREATED);
                     ResponseDTO responseDTO = new ResponseDTO(ResponseStatus.LOGIN_OK, "Login OK", tokensDTO);
-                    String jsonBody = new ObjectMapper().writeValueAsString(responseDTO);
-                    PrintWriter writer = response.getWriter();
-                    writer.print(jsonBody);
+
+                    ioUtil.writeResponseBody(response, responseDTO);
                     return;
                 } else if (memberDTO.getFromSocial() == MemberSocial.GGL) {
+
                     if (!memberDTO.isEnabled()) throw new Exception("User disabled");
                     if (!memberDTO.isAccountNonExpired()) throw new Exception("Account expired");
                     if (!memberDTO.isCredentialsNonExpired()) throw new Exception("Credential expired");
@@ -123,19 +116,19 @@ public class ApiGoogleFilter extends OncePerRequestFilter {
 
                         response.setStatus(HttpServletResponse.SC_OK);
                         ResponseDTO responseDTO = new ResponseDTO(ResponseStatus.LOGIN_OK, "Login OK", tokensDTO);
-                        String jsonBody = new ObjectMapper().writeValueAsString(responseDTO);
-                        PrintWriter writer = response.getWriter();
-                        writer.print(jsonBody);
+
+                        ioUtil.writeResponseBody(response, responseDTO);
                     } else if (new AntPathRequestMatcher("/api/google/member/deleteAccount").matches(request)) {
                         memberDTO.setEnabled(false);
                         memberService.disableSocialUser(memberDTO.getMemberId());
 
+                        response.setStatus(HttpServletResponse.SC_OK);
+
                         ResponseDTO responseDTO = new ResponseDTO();
                         responseDTO.setApiStatus(ResponseStatus.AC_DL_OK);
                         responseDTO.setApiMsg("AC_DL OK");
-                        String jsonBody = new ObjectMapper().writeValueAsString(responseDTO);
-                        PrintWriter writer = response.getWriter();
-                        writer.print(jsonBody);
+
+                        ioUtil.writeResponseBody(response, responseDTO);
                     }
                     return;
                 } else {
@@ -154,10 +147,7 @@ public class ApiGoogleFilter extends OncePerRequestFilter {
                 }
                 responseDTO.setApiMsg(error.getMessage());
 
-                String jsonBody = new ObjectMapper().writeValueAsString(responseDTO);
-
-                PrintWriter writer = response.getWriter();
-                writer.print(jsonBody);
+                ioUtil.writeResponseBody(response, responseDTO);
             }
             return;
         }

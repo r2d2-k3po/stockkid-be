@@ -4,6 +4,7 @@ public enum ResponseStatus {
 
     SIGNUP_OK, SIGNUP_FAIL,
     LOGIN_OK, LOGIN_FAIL,
+    LOGOUT_OK, LOGOUT_FAIL,
     ACCESS_FAIL,
     REFRESH_OK, REFRESH_FAIL,
     PW_CH_OK, PW_CH_FAIL,

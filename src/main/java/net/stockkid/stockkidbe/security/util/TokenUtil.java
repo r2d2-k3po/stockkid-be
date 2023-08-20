@@ -45,4 +45,9 @@ public class TokenUtil {
             throw new Exception("refreshToken invalidated");
         }
     }
+
+    public void invalidateToken(String sub) throws Exception {
+
+        memberService.updateRefreshToken(sub, null);
+    }
 }

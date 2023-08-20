@@ -1,6 +1,5 @@
 package net.stockkid.stockkidbe.security.filter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -9,6 +8,7 @@ import lombok.extern.log4j.Log4j2;
 import net.stockkid.stockkidbe.dto.JWTClaimsDTO;
 import net.stockkid.stockkidbe.dto.ResponseDTO;
 import net.stockkid.stockkidbe.dto.ResponseStatus;
+import net.stockkid.stockkidbe.security.util.IoUtil;
 import net.stockkid.stockkidbe.security.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,7 +20,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.security.core.context.SecurityContext;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.Collections;
 
 @Log4j2
@@ -28,6 +27,9 @@ public class ApiAccessFilter extends OncePerRequestFilter {
 
     @Autowired
     private JwtUtil jwtUtil;
+
+    @Autowired
+    private IoUtil ioUtil;
 
     private final AntPathRequestMatcher antPathRequestMatcher;
 
@@ -61,16 +63,12 @@ public class ApiAccessFilter extends OncePerRequestFilter {
                 log.info(e.getMessage());
 
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.setContentType("application/json;charset=utf-8");
 
                 ResponseDTO responseDTO = new ResponseDTO();
                 responseDTO.setApiStatus(ResponseStatus.ACCESS_FAIL);
                 responseDTO.setApiMsg(e.getMessage());
 
-                String jsonBody = new ObjectMapper().writeValueAsString(responseDTO);
-
-                PrintWriter writer = response.getWriter();
-                writer.print(jsonBody);
+                ioUtil.writeResponseBody(response, responseDTO);
             }
             return;
         }

@@ -98,7 +98,7 @@ public class SecurityConfig {
 
     @Bean
     public ApiRefreshFilter apiRefreshFilter() throws Exception {
-        return new ApiRefreshFilter(new AntPathRequestMatcher("/api/refresh"));
+        return new ApiRefreshFilter(new AntPathRequestMatcher("/api/refresh/**"));
     }
 
     @Bean
