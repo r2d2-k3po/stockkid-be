@@ -5,8 +5,9 @@ import lombok.extern.log4j.Log4j2;
 import net.stockkid.stockkidbe.entity.MemberRole;
 import net.stockkid.stockkidbe.repository.MemberRepository;
 import net.stockkid.stockkidbe.security.filter.ApiGoogleFilter;
-import net.stockkid.stockkidbe.security.filter.ApiJwtFilter;
+import net.stockkid.stockkidbe.security.filter.ApiAccessFilter;
 import net.stockkid.stockkidbe.security.filter.ApiLoginFilter;
+import net.stockkid.stockkidbe.security.filter.ApiRefreshFilter;
 import net.stockkid.stockkidbe.security.handler.ApiLoginFailureHandler;
 import net.stockkid.stockkidbe.security.service.UserDetailsServiceImpl;
 import net.stockkid.stockkidbe.service.MemberServiceImpl;
@@ -55,11 +56,12 @@ public class SecurityConfig {
                 .cors(withDefaults())
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/api/member/signup").permitAll()
-                        .requestMatchers("/api/jwt/member/changePassword").hasRole("USER")
-                        .requestMatchers("/api/jwt/member/deleteAccount").hasRole("USER")
+                        .requestMatchers("/api/access/member/changePassword").hasRole("USER")
+                        .requestMatchers("/api/access/member/deleteAccount").hasRole("USER")
                         .anyRequest().authenticated()
                 )
-                .addFilterBefore(apiJwtFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(apiAccessFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(apiRefreshFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(apiLoginFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(apiGoogleFilter(), UsernamePasswordAuthenticationFilter.class)
                 .csrf((csrf) -> csrf.disable());
@@ -90,8 +92,13 @@ public class SecurityConfig {
     }
 
     @Bean
-    public ApiJwtFilter apiJwtFilter() throws Exception {
-        return new ApiJwtFilter(new AntPathRequestMatcher("/api/jwt/**"));
+    public ApiAccessFilter apiAccessFilter() throws Exception {
+        return new ApiAccessFilter(new AntPathRequestMatcher("/api/access/**"));
+    }
+
+    @Bean
+    public ApiRefreshFilter apiRefreshFilter() throws Exception {
+        return new ApiRefreshFilter(new AntPathRequestMatcher("/api/refresh"));
     }
 
     @Bean

@@ -29,6 +29,9 @@ public class Member extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private @Setter MemberSocial fromSocial;
 
+    @Column
+    private @Setter String refreshToken;
+
     @Column(nullable = false)
     private @Setter boolean accountNonExpired;
 

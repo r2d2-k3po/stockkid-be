@@ -15,7 +15,7 @@ import lombok.extern.log4j.Log4j2;
 import net.stockkid.stockkidbe.dto.*;
 import net.stockkid.stockkidbe.entity.MemberRole;
 import net.stockkid.stockkidbe.entity.MemberSocial;
-import net.stockkid.stockkidbe.security.util.JwtUtil;
+import net.stockkid.stockkidbe.security.util.TokenUtil;
 import net.stockkid.stockkidbe.service.MemberService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,7 +32,7 @@ import java.util.Collections;
 public class ApiGoogleFilter extends OncePerRequestFilter {
 
     @Autowired
-    private JwtUtil jwtUtil;
+    private TokenUtil tokenUtil;
 
     @Value("${spring.security.oauth2.client.registration.google.client-id}")
     private String googleClientId;
@@ -65,7 +65,6 @@ public class ApiGoogleFilter extends OncePerRequestFilter {
                 AuthcodeDTO authcodeDTO = new ObjectMapper().readValue(requestBody.toString(), AuthcodeDTO.class);
 
                 log.info("authcode: " + authcodeDTO.getAuthcode());
-                log.info("googleClientId: " + googleClientId);
 
                 GoogleTokenResponse googleTokenResponse = new GoogleAuthorizationCodeTokenRequest(
                         new NetHttpTransport(), new GsonFactory(),
@@ -98,8 +97,7 @@ public class ApiGoogleFilter extends OncePerRequestFilter {
                 MemberDTO memberDTO = memberService.loadUserByUsername(email);
 
                 if (memberDTO == null) {
-                    String token = jwtUtil.generateToken(email, MemberRole.USER.name(), MemberSocial.GGL.name());
-                    log.info("successful signup token : " + token);
+                    TokensDTO tokensDTO = tokenUtil.generateTokens(email, MemberRole.USER.name(), MemberSocial.GGL.name());
 
                     MemberDTO newMemberDTO = new MemberDTO();
                     newMemberDTO.setUsername(email);
@@ -109,7 +107,7 @@ public class ApiGoogleFilter extends OncePerRequestFilter {
                     memberService.createUser(newMemberDTO);
 
                     response.setStatus(HttpServletResponse.SC_CREATED);
-                    ResponseDTO responseDTO = new ResponseDTO(ResponseStatus.LOGIN_OK, "Login OK", token);
+                    ResponseDTO responseDTO = new ResponseDTO(ResponseStatus.LOGIN_OK, "Login OK", tokensDTO);
                     String jsonBody = new ObjectMapper().writeValueAsString(responseDTO);
                     PrintWriter writer = response.getWriter();
                     writer.print(jsonBody);
@@ -121,11 +119,10 @@ public class ApiGoogleFilter extends OncePerRequestFilter {
                     if (!memberDTO.isAccountNonLocked()) throw new Exception("Account locked");
 
                     if (new AntPathRequestMatcher("/api/google/member/signin").matches(request)) {
-                        String token = jwtUtil.generateToken(email, memberDTO.getMemberRole().name(), MemberSocial.GGL.name());
-                        log.info("successful token : " + token);
+                        TokensDTO tokensDTO = tokenUtil.generateTokens(email, memberDTO.getMemberRole().name(), MemberSocial.GGL.name());
 
                         response.setStatus(HttpServletResponse.SC_OK);
-                        ResponseDTO responseDTO = new ResponseDTO(ResponseStatus.LOGIN_OK, "Login OK", token);
+                        ResponseDTO responseDTO = new ResponseDTO(ResponseStatus.LOGIN_OK, "Login OK", tokensDTO);
                         String jsonBody = new ObjectMapper().writeValueAsString(responseDTO);
                         PrintWriter writer = response.getWriter();
                         writer.print(jsonBody);

@@ -24,14 +24,14 @@ import java.io.PrintWriter;
 import java.util.Collections;
 
 @Log4j2
-public class ApiJwtFilter extends OncePerRequestFilter {
+public class ApiAccessFilter extends OncePerRequestFilter {
 
     @Autowired
     private JwtUtil jwtUtil;
 
     private final AntPathRequestMatcher antPathRequestMatcher;
 
-    public ApiJwtFilter (AntPathRequestMatcher antPathRequestMatcher) {
+    public ApiAccessFilter(AntPathRequestMatcher antPathRequestMatcher) {
         this.antPathRequestMatcher = antPathRequestMatcher;
     }
 
@@ -39,14 +39,13 @@ public class ApiJwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         log.info("RequestURI : " + request.getRequestURI());
-        log.info("matches : " + antPathRequestMatcher.matches(request));
 
         if (antPathRequestMatcher.matches(request)) {
-            log.info("ApiJwtFilter---------------------");
+            log.info("ApiAccessFilter---------------------");
 
             try {
-                String token = extractTokenFromHeader(request);
-                JWTClaimsDTO jwtClaimsDTO = jwtUtil.verifyAndExtract(token);
+                String accessToken = extractTokenFromHeader(request);
+                JWTClaimsDTO jwtClaimsDTO = jwtUtil.verifyAndExtractAccessToken(accessToken);
 
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(jwtClaimsDTO.getUsername(), null, Collections.singleton(new SimpleGrantedAuthority("ROLE_" + jwtClaimsDTO.getRole())));
 
@@ -58,16 +57,15 @@ public class ApiJwtFilter extends OncePerRequestFilter {
 
                 filterChain.doFilter(request, response);
                 return;
-            } catch (Exception error) {
-                error.printStackTrace();
-                log.info(error.getMessage());
+            } catch (Exception e) {
+                log.info(e.getMessage());
 
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.setContentType("application/json;charset=utf-8");
 
                 ResponseDTO responseDTO = new ResponseDTO();
-                responseDTO.setApiStatus(ResponseStatus.JWT_FAIL);
-                responseDTO.setApiMsg(error.getMessage());
+                responseDTO.setApiStatus(ResponseStatus.ACCESS_FAIL);
+                responseDTO.setApiMsg(e.getMessage());
 
                 String jsonBody = new ObjectMapper().writeValueAsString(responseDTO);
 
@@ -84,7 +82,6 @@ public class ApiJwtFilter extends OncePerRequestFilter {
         String authHeader = request.getHeader("authorization");
 
         if (StringUtils.hasText(authHeader) && authHeader.startsWith("Bearer")) {
-            log.info("Authorization : " + authHeader);
             return authHeader.substring(7);
         }
         return null;

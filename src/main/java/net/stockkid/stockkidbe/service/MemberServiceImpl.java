@@ -60,6 +60,7 @@ public class MemberServiceImpl implements MemberService {
         existingUser.setCredentialsNonExpired(dto.isCredentialsNonExpired());
         existingUser.setEnabled(dto.isEnabled());
         existingUser.setFromSocial(dto.getFromSocial());
+        existingUser.setRefreshToken(dto.getRefreshToken());
 
         memberRepository.save(existingUser);
     }
@@ -113,6 +114,23 @@ public class MemberServiceImpl implements MemberService {
         Member existingUser = optionalUser.orElseThrow(() -> new IllegalArgumentException("memberId not found"));
 
         existingUser.setEnabled(false);
+        memberRepository.save(existingUser);
+    }
+
+    @Override
+    public String loadRefreshTokenByUsername(String username) throws IllegalArgumentException {
+        Optional<Member> optionalUser = memberRepository.findByUsername(username);
+        Member existingUser = optionalUser.orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        return existingUser.getRefreshToken();
+    }
+
+    @Override
+    public void updateRefreshToken(String username, String refreshToken) throws IllegalArgumentException {
+        Optional<Member> optionalUser = memberRepository.findByUsername(username);
+        Member existingUser = optionalUser.orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        existingUser.setRefreshToken(refreshToken);
         memberRepository.save(existingUser);
     }
 

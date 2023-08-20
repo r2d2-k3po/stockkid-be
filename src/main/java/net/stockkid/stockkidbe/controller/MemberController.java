@@ -60,7 +60,7 @@ public class MemberController {
         }
     }
 
-    @PatchMapping("/jwt/member/changePassword")
+    @PatchMapping("/access/member/changePassword")
     public ResponseEntity<ResponseDTO> changePassword(@RequestBody PasswordDTO passwordDTO) {
 
         log.info("--------------changePassword--------------");
@@ -92,7 +92,7 @@ public class MemberController {
         }
     }
 
-    @PatchMapping("/jwt/member/deleteAccount")
+    @PatchMapping("/access/member/deleteAccount")
     public ResponseEntity<ResponseDTO> deleteAccount(@RequestBody AuthDTO authDTO) {
 
         log.info("--------------deleteAccount--------------");

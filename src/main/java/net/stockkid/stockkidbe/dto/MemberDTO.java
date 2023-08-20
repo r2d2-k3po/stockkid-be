@@ -21,5 +21,6 @@ public class MemberDTO extends AuthDTO {
     private boolean credentialsNonExpired = true;
     private boolean enabled = true;
     private MemberSocial fromSocial = MemberSocial.UP;
+    private String refreshToken;
     private LocalDateTime regDate, modDate;
 }

@@ -3,6 +3,7 @@ package net.stockkid.stockkidbe.security.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.stockkid.stockkidbe.entity.Member;
+import net.stockkid.stockkidbe.entity.MemberSocial;
 import net.stockkid.stockkidbe.repository.MemberRepository;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
@@ -33,6 +34,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         }
 
         Member member = result.get();
+        if (member.getFromSocial() != MemberSocial.UP) throw new UsernameNotFoundException("User not found");
 
         log.info("----------------------------------------------");
         log.info(member);

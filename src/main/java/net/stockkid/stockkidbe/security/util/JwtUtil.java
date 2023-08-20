@@ -36,7 +36,7 @@ public class JwtUtil {
                 return Base64.getEncoder().encodeToString(secretKey.getEncoded());
             }
         } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
+            log.info(e.getMessage());
         }
         return null;
     }
@@ -46,14 +46,42 @@ public class JwtUtil {
             byte[] decodedKey = Base64.getDecoder().decode(base64EncodedSecretKey.getBytes(StandardCharsets.UTF_8));
             return Keys.hmacShaKeyFor(decodedKey);
         } catch (NullPointerException e) {
-            e.printStackTrace();
+            log.info(e.getMessage());
         }
         return null;
     }
 
-    public String generateToken(String sub, String rol, String soc) throws Exception {
+    public String generateAccessToken(String sub, String rol) throws Exception {
 
-        long sevenDaysInMinutes = 60 * 24 * 7;
+        long thirtyMinutes = 30;
+        SecretKey secretKey = getSecretKeyFromProperties();
+
+        return Jwts.builder()
+                .setSubject(sub)
+                .claim("rol", rol)
+                .setIssuedAt(new Date())
+                .setExpiration(Date.from(ZonedDateTime.now().plusMinutes(thirtyMinutes).toInstant()))
+                .signWith(secretKey)
+                .compact();
+    }
+
+    public JWTClaimsDTO verifyAndExtractAccessToken(String tokenStr) throws Exception {
+
+        SecretKey secretKey = getSecretKeyFromProperties();
+
+        JWTClaimsDTO jwtClaimsDTO = new JWTClaimsDTO();
+        Jwt<?, ?> jwt = Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(tokenStr);
+
+        DefaultClaims claims = (DefaultClaims) jwt.getBody();
+
+        jwtClaimsDTO.setUsername(claims.getSubject());
+        jwtClaimsDTO.setRole((String) claims.get("rol"));
+        return jwtClaimsDTO;
+    }
+
+    public String generateRefreshToken(String sub, String rol, String soc) throws Exception {
+
+        long sevenDaysInMinutes = 7 * 24 * 60;
         SecretKey secretKey = getSecretKeyFromProperties();
 
         return Jwts.builder()
@@ -62,20 +90,16 @@ public class JwtUtil {
                 .claim("soc", soc)
                 .setIssuedAt(new Date())
                 .setExpiration(Date.from(ZonedDateTime.now().plusMinutes(sevenDaysInMinutes).toInstant()))
-//                .setExpiration(Date.from(ZonedDateTime.now().plusSeconds(180).toInstant()))
                 .signWith(secretKey)
                 .compact();
     }
 
-    public JWTClaimsDTO verifyAndExtract(String tokenStr) throws Exception {
+    public JWTClaimsDTO verifyAndExtractRefreshToken(String tokenStr) throws Exception {
 
         SecretKey secretKey = getSecretKeyFromProperties();
 
         JWTClaimsDTO jwtClaimsDTO = new JWTClaimsDTO();
         Jwt<?, ?> jwt = Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(tokenStr);
-
-        log.info(jwt);
-        log.info(jwt.getBody().getClass());
 
         DefaultClaims claims = (DefaultClaims) jwt.getBody();
 

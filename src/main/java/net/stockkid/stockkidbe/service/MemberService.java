@@ -17,6 +17,10 @@ public interface MemberService {
 
     void disableSocialUser(Long memberId);
 
+    String loadRefreshTokenByUsername(String username);
+
+    void updateRefreshToken(String username, String refreshToken);
+
     boolean userExists(String username);
 
     MemberDTO loadUserByUsername(String username);
@@ -32,6 +36,7 @@ public interface MemberService {
                 .credentialsNonExpired(dto.isCredentialsNonExpired())
                 .enabled(dto.isEnabled())
                 .fromSocial(dto.getFromSocial())
+                .refreshToken(dto.getRefreshToken())
                 .build();
     }
 
@@ -46,6 +51,7 @@ public interface MemberService {
                 .credentialsNonExpired(entity.isCredentialsNonExpired())
                 .enabled(entity.isEnabled())
                 .fromSocial(entity.getFromSocial())
+                .refreshToken(entity.getRefreshToken())
                 .regDate(entity.getRegDate())
                 .modDate(entity.getModDate())
                 .build();
