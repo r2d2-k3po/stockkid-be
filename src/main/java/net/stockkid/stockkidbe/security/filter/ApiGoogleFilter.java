@@ -90,14 +90,16 @@ public class ApiGoogleFilter extends OncePerRequestFilter {
                 MemberDTO memberDTO = memberService.loadUserByUsername(email);
 
                 if (memberDTO == null) {
-                    TokensDTO tokensDTO = tokenUtil.generateTokens(email, MemberRole.USER.name(), MemberSocial.GGL.name());
-
                     MemberDTO newMemberDTO = new MemberDTO();
                     newMemberDTO.setUsername(email);
                     newMemberDTO.setPassword(generateRandomPassword(30));
                     newMemberDTO.setFromSocial(MemberSocial.GGL);
 
+                    log.info("create new Google user");
                     memberService.createUser(newMemberDTO);
+
+                    log.info("create tokens for new user");
+                    TokensDTO tokensDTO = tokenUtil.generateTokens(email, MemberRole.USER.name(), MemberSocial.GGL.name());
 
                     response.setStatus(HttpServletResponse.SC_CREATED);
                     ResponseDTO responseDTO = new ResponseDTO(ResponseStatus.LOGIN_OK, "Login OK", tokensDTO);
@@ -105,13 +107,13 @@ public class ApiGoogleFilter extends OncePerRequestFilter {
                     ioUtil.writeResponseBody(response, responseDTO);
                     return;
                 } else if (memberDTO.getFromSocial() == MemberSocial.GGL) {
-
                     if (!memberDTO.isEnabled()) throw new Exception("User disabled");
                     if (!memberDTO.isAccountNonExpired()) throw new Exception("Account expired");
                     if (!memberDTO.isCredentialsNonExpired()) throw new Exception("Credential expired");
                     if (!memberDTO.isAccountNonLocked()) throw new Exception("Account locked");
 
                     if (new AntPathRequestMatcher("/api/google/member/signin").matches(request)) {
+                        log.info("create tokens for existing user");
                         TokensDTO tokensDTO = tokenUtil.generateTokens(email, memberDTO.getMemberRole().name(), MemberSocial.GGL.name());
 
                         response.setStatus(HttpServletResponse.SC_OK);
@@ -119,6 +121,7 @@ public class ApiGoogleFilter extends OncePerRequestFilter {
 
                         ioUtil.writeResponseBody(response, responseDTO);
                     } else if (new AntPathRequestMatcher("/api/google/member/deleteAccount").matches(request)) {
+                        log.info("disable existing Google user");
                         memberDTO.setEnabled(false);
                         memberService.disableSocialUser(memberDTO.getMemberId());
 

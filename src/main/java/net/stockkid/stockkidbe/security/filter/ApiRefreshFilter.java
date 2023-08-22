@@ -67,12 +67,12 @@ public class ApiRefreshFilter extends OncePerRequestFilter {
             } catch (Exception e) {
                 log.info(e.getMessage());
 
-                response.setStatus(HttpServletResponse.SC_CONFLICT);
-
                 ResponseDTO responseDTO = new ResponseDTO();
                 if (new AntPathRequestMatcher("/api/refresh/tokens").matches(request)) {
+                    response.setStatus(HttpServletResponse.SC_OK);
                     responseDTO.setApiStatus(ResponseStatus.REFRESH_FAIL);
                 } else if (new AntPathRequestMatcher("/api/refresh/logout").matches(request)) {
+                    response.setStatus(HttpServletResponse.SC_CONFLICT);
                     responseDTO.setApiStatus(ResponseStatus.LOGOUT_FAIL);
                 }
                 responseDTO.setApiMsg(e.getMessage());
