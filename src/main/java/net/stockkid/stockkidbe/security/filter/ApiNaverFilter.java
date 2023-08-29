@@ -19,14 +19,21 @@ import net.stockkid.stockkidbe.security.util.TokenUtil;
 import net.stockkid.stockkidbe.service.MemberService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 
 @Log4j2
-public class ApiGoogleFilter extends OncePerRequestFilter {
+public class ApiNaverFilter  extends OncePerRequestFilter {
 
     @Autowired
     private TokenUtil tokenUtil;
@@ -34,17 +41,13 @@ public class ApiGoogleFilter extends OncePerRequestFilter {
     @Autowired
     private IoUtil ioUtil;
 
-    @Value("${spring.security.oauth2.client.registration.google.client-id}")
-    private String googleClientId;
 
-    @Value("${spring.security.oauth2.client.registration.google.client-secret}")
-    private String googleClientSecret;
 
     private final AntPathRequestMatcher antPathRequestMatcher;
 
     private final MemberService memberService;
 
-    public ApiGoogleFilter(AntPathRequestMatcher antPathRequestMatcher, MemberService memberService) {
+    public ApiNaverFilter(AntPathRequestMatcher antPathRequestMatcher, MemberService memberService) {
         this.antPathRequestMatcher = antPathRequestMatcher;
         this.memberService = memberService;
     }
@@ -53,26 +56,18 @@ public class ApiGoogleFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         if (antPathRequestMatcher.matches(request)) {
-            log.info("ApiGoogleFilter---------------------");
+            log.info("ApiNaverFilter---------------------");
 
             try {
                 AuthcodeDTO authcodeDTO = ioUtil.readRequestBody(request, AuthcodeDTO.class);
 
                 log.info("authcode: " + authcodeDTO.getAuthcode());
+                log.info("state: " + authcodeDTO.getState());
 
-                GoogleTokenResponse googleTokenResponse = new GoogleAuthorizationCodeTokenRequest(
-                        new NetHttpTransport(), new GsonFactory(),
-                        googleClientId, googleClientSecret,
-                        authcodeDTO.getAuthcode(), "postmessage")
-                        .execute();
+                NaverTokenDTO naverTokenDTO = ioUtil.getNaverToken(authcodeDTO);
 
-                log.info("Id token: " + googleTokenResponse.getIdToken());
+                log.info(naverTokenDTO);
 
-                GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new GsonFactory())
-                        .setAudience(Collections.singletonList(googleClientId))
-                        .build();
-
-                GoogleIdToken idToken = verifier.verify(googleTokenResponse.getIdToken());
                 if (idToken == null) {
                     throw new Exception("Invalid ID token.");
                 }

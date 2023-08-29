@@ -9,4 +9,5 @@ import lombok.NoArgsConstructor;
 @Data
 public class AuthcodeDTO {
     private String authcode;
+    private String state;
 }

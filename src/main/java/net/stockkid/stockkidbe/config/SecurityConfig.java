@@ -4,10 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.stockkid.stockkidbe.entity.MemberRole;
 import net.stockkid.stockkidbe.repository.MemberRepository;
-import net.stockkid.stockkidbe.security.filter.ApiGoogleFilter;
-import net.stockkid.stockkidbe.security.filter.ApiAccessFilter;
-import net.stockkid.stockkidbe.security.filter.ApiLoginFilter;
-import net.stockkid.stockkidbe.security.filter.ApiRefreshFilter;
+import net.stockkid.stockkidbe.security.filter.*;
 import net.stockkid.stockkidbe.security.handler.ApiLoginFailureHandler;
 import net.stockkid.stockkidbe.security.service.UserDetailsServiceImpl;
 import net.stockkid.stockkidbe.service.MemberServiceImpl;
@@ -64,6 +61,7 @@ public class SecurityConfig {
                 .addFilterBefore(apiRefreshFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(apiLoginFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(apiGoogleFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(apiNaverFilter(), UsernamePasswordAuthenticationFilter.class)
                 .csrf((csrf) -> csrf.disable());
 
         return http.build();
@@ -104,6 +102,11 @@ public class SecurityConfig {
     @Bean
     public ApiGoogleFilter apiGoogleFilter() throws Exception {
         return new ApiGoogleFilter(new AntPathRequestMatcher("/api/google/**"), new MemberServiceImpl(memberRepository, passwordEncoder()));
+    }
+
+    @Bean
+    public ApiNaverFilter apiNaverFilter() throws Exception {
+        return new ApiNaverFilter(new AntPathRequestMatcher("/api/naver/**"), new MemberServiceImpl(memberRepository, passwordEncoder()));
     }
 
     @Bean

@@ -7,6 +7,7 @@ import net.stockkid.stockkidbe.service.MemberService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.security.SecureRandom;
 import java.util.Objects;
 
 @Log4j2
@@ -49,5 +50,19 @@ public class TokenUtil {
     public void invalidateToken(String sub) throws Exception {
 
         memberService.updateRefreshToken(sub, null);
+    }
+
+    public String generateRandomPassword(int length) {
+
+        String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+";
+        StringBuilder password = new StringBuilder();
+        SecureRandom random = new SecureRandom();
+
+        for (int i = 0; i < length; i++) {
+            int randomIndex = random.nextInt(CHARACTERS.length());
+            char randomChar = CHARACTERS.charAt(randomIndex);
+            password.append(randomChar);
+        }
+        return password.toString();
     }
 }

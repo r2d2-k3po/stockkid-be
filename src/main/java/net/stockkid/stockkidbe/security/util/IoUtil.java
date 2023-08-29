@@ -4,8 +4,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.log4j.Log4j2;
+import net.stockkid.stockkidbe.dto.AuthcodeDTO;
+import net.stockkid.stockkidbe.dto.NaverTokenDTO;
 import net.stockkid.stockkidbe.dto.ResponseDTO;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -14,6 +20,21 @@ import java.io.PrintWriter;
 @Log4j2
 @Component
 public class IoUtil {
+
+    @Value("${spring.security.oauth2.client.registration.naver.client-id}")
+    private String naverClientId;
+
+    @Value("${spring.security.oauth2.client.registration.naver.client-secret}")
+    private String naverClientSecret;
+
+    @Value("${spring.security.oauth2.client.registration.naver.authorization-grant-type}")
+    private String naverGrantType;
+
+    @Value("${spring.security.oauth2.client.provider.naver.token-uri}")
+    private String naverTokenUri;
+
+    @Value("${spring.security.oauth2.client.provider.naver.user-info-uri}")
+    private String naverUserInfoUri;
 
     public <T> T readRequestBody(HttpServletRequest request, Class<T> valueType) throws IOException {
 
@@ -34,5 +55,25 @@ public class IoUtil {
 
         PrintWriter writer = response.getWriter();
         writer.print(jsonBody);
+    }
+
+    public NaverTokenDTO getNaverToken(AuthcodeDTO authcodeDTO) throws Exception {
+
+        WebClient webClient = WebClient.builder()
+                .baseUrl(naverTokenUri)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+                .build();
+
+        return webClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .queryParam("grant_type", naverGrantType)
+                        .queryParam("client_id", naverClientId)
+                        .queryParam("client_secret", naverClientSecret)
+                        .queryParam("code", authcodeDTO.getAuthcode())
+                        .queryParam("state", authcodeDTO.getState())
+                        .build())
+                .retrieve()
+                .bodyToMono(NaverTokenDTO.class)
+                .block();
     }
 }
