@@ -4,9 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.log4j.Log4j2;
-import net.stockkid.stockkidbe.dto.AuthcodeDTO;
-import net.stockkid.stockkidbe.dto.NaverTokenDTO;
-import net.stockkid.stockkidbe.dto.ResponseDTO;
+import net.stockkid.stockkidbe.dto.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -75,5 +73,22 @@ public class IoUtil {
                 .retrieve()
                 .bodyToMono(NaverTokenDTO.class)
                 .block();
+    }
+
+    public NaverUserInfoDTO getNaverUserInfo(String access_token) throws Exception {
+
+        WebClient webClient = WebClient.builder()
+                .baseUrl(naverUserInfoUri)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+                .build();
+
+        NaverProfileDTO naverProfileDTO = webClient.get()
+                .header("Authorization", "Bearer " + access_token)
+                .retrieve()
+                .bodyToMono(NaverProfileDTO.class)
+                .block();
+        log.info(naverProfileDTO);
+
+        return naverProfileDTO.getResponse();
     }
 }

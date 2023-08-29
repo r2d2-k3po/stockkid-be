@@ -1,11 +1,5 @@
 package net.stockkid.stockkidbe.security.filter;
 
-import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeTokenRequest;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
-import com.google.api.client.googleapis.auth.oauth2.GoogleTokenResponse;
-import com.google.api.client.http.javanet.NetHttpTransport;
-import com.google.api.client.json.gson.GsonFactory;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,19 +12,10 @@ import net.stockkid.stockkidbe.security.util.IoUtil;
 import net.stockkid.stockkidbe.security.util.TokenUtil;
 import net.stockkid.stockkidbe.service.MemberService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.filter.OncePerRequestFilter;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.util.Collections;
 
 @Log4j2
 public class ApiNaverFilter  extends OncePerRequestFilter {
@@ -60,26 +45,16 @@ public class ApiNaverFilter  extends OncePerRequestFilter {
 
             try {
                 AuthcodeDTO authcodeDTO = ioUtil.readRequestBody(request, AuthcodeDTO.class);
-
                 log.info("authcode: " + authcodeDTO.getAuthcode());
                 log.info("state: " + authcodeDTO.getState());
 
                 NaverTokenDTO naverTokenDTO = ioUtil.getNaverToken(authcodeDTO);
-
                 log.info(naverTokenDTO);
 
-                if (idToken == null) {
-                    throw new Exception("Invalid ID token.");
-                }
+                NaverUserInfoDTO naverUserInfoDTO = ioUtil.getNaverUserInfo(naverTokenDTO.getAccess_token());
+                log.info(naverUserInfoDTO);
 
-                GoogleIdToken.Payload payload = idToken.getPayload();
-                String email = payload.getEmail();
-                boolean emailVerified = payload.getEmailVerified();
-                log.info("email : " + email);
-                log.info(emailVerified);
-                if (!emailVerified) {
-                    throw new Exception("Email not verified.");
-                }
+                String email = naverUserInfoDTO.getEmail();
 
                 MemberDTO memberDTO = memberService.loadUserByUsername(email);
 
@@ -87,35 +62,35 @@ public class ApiNaverFilter  extends OncePerRequestFilter {
                     MemberDTO newMemberDTO = new MemberDTO();
                     newMemberDTO.setUsername(email);
                     newMemberDTO.setPassword(tokenUtil.generateRandomPassword(30));
-                    newMemberDTO.setFromSocial(MemberSocial.GGL);
+                    newMemberDTO.setFromSocial(MemberSocial.NAV);
 
-                    log.info("create new Google user");
+                    log.info("create new Naver user");
                     memberService.createUser(newMemberDTO);
 
                     log.info("create tokens for new user");
-                    TokensDTO tokensDTO = tokenUtil.generateTokens(email, MemberRole.USER.name(), MemberSocial.GGL.name());
+                    TokensDTO tokensDTO = tokenUtil.generateTokens(email, MemberRole.USER.name(), MemberSocial.NAV.name());
 
                     response.setStatus(HttpServletResponse.SC_CREATED);
                     ResponseDTO responseDTO = new ResponseDTO(ResponseStatus.LOGIN_OK, "Login OK", tokensDTO);
 
                     ioUtil.writeResponseBody(response, responseDTO);
                     return;
-                } else if (memberDTO.getFromSocial() == MemberSocial.GGL) {
+                } else if (memberDTO.getFromSocial() == MemberSocial.NAV) {
                     if (!memberDTO.isEnabled()) throw new Exception("User disabled");
                     if (!memberDTO.isAccountNonExpired()) throw new Exception("Account expired");
                     if (!memberDTO.isCredentialsNonExpired()) throw new Exception("Credential expired");
                     if (!memberDTO.isAccountNonLocked()) throw new Exception("Account locked");
 
-                    if (new AntPathRequestMatcher("/api/google/member/signin").matches(request)) {
+                    if (new AntPathRequestMatcher("/api/naver/member/signin").matches(request)) {
                         log.info("create tokens for existing user");
-                        TokensDTO tokensDTO = tokenUtil.generateTokens(email, memberDTO.getMemberRole().name(), MemberSocial.GGL.name());
+                        TokensDTO tokensDTO = tokenUtil.generateTokens(email, memberDTO.getMemberRole().name(), MemberSocial.NAV.name());
 
                         response.setStatus(HttpServletResponse.SC_OK);
                         ResponseDTO responseDTO = new ResponseDTO(ResponseStatus.LOGIN_OK, "Login OK", tokensDTO);
 
                         ioUtil.writeResponseBody(response, responseDTO);
-                    } else if (new AntPathRequestMatcher("/api/google/member/deleteAccount").matches(request)) {
-                        log.info("disable existing Google user");
+                    } else if (new AntPathRequestMatcher("/api/naver/member/deleteAccount").matches(request)) {
+                        log.info("disable existing Naver user");
                         memberDTO.setEnabled(false);
                         memberService.disableSocialUser(memberDTO.getMemberId());
 
@@ -137,9 +112,9 @@ public class ApiNaverFilter  extends OncePerRequestFilter {
                 response.setStatus(HttpServletResponse.SC_CONFLICT);
 
                 ResponseDTO responseDTO = new ResponseDTO();
-                if (new AntPathRequestMatcher("/api/google/member/signin").matches(request)) {
+                if (new AntPathRequestMatcher("/api/naver/member/signin").matches(request)) {
                     responseDTO.setApiStatus(ResponseStatus.LOGIN_FAIL);
-                } else if (new AntPathRequestMatcher("/api/google/member/deleteAccount").matches(request)) {
+                } else if (new AntPathRequestMatcher("/api/naver/member/deleteAccount").matches(request)) {
                     responseDTO.setApiStatus(ResponseStatus.AC_DL_FAIL);
                 }
                 responseDTO.setApiMsg(error.getMessage());
