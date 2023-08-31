@@ -65,20 +65,6 @@ public class JwtUtil {
                 .compact();
     }
 
-    public JWTClaimsDTO verifyAndExtractAccessToken(String tokenStr) throws Exception {
-
-        SecretKey secretKey = getSecretKeyFromProperties();
-
-        JWTClaimsDTO jwtClaimsDTO = new JWTClaimsDTO();
-        Jwt<?, ?> jwt = Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(tokenStr);
-
-        DefaultClaims claims = (DefaultClaims) jwt.getBody();
-
-        jwtClaimsDTO.setUsername(claims.getSubject());
-        jwtClaimsDTO.setRole((String) claims.get("rol"));
-        return jwtClaimsDTO;
-    }
-
     public String generateRefreshToken(String sub, String rol, String soc) throws Exception {
 
         long sevenDaysInMinutes = 7 * 24 * 60;
@@ -94,7 +80,7 @@ public class JwtUtil {
                 .compact();
     }
 
-    public JWTClaimsDTO verifyAndExtractRefreshToken(String tokenStr) throws Exception {
+    public JWTClaimsDTO verifyAndExtractToken(String tokenStr) throws Exception {
 
         SecretKey secretKey = getSecretKeyFromProperties();
 

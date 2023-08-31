@@ -44,17 +44,17 @@ public class ApiRefreshFilter extends OncePerRequestFilter {
             try {
                 TokensDTO tokensDTO = ioUtil.readRequestBody(request, TokensDTO.class);
 
-                JWTClaimsDTO jwtClaimsDTO = jwtUtil.verifyAndExtractRefreshToken(tokensDTO.getRefreshToken());
+                JWTClaimsDTO jwtClaimsDTO = jwtUtil.verifyAndExtractToken(tokensDTO.getRefreshToken());
 
                 if (new AntPathRequestMatcher("/api/refresh/tokens").matches(request)) {
-                    TokensDTO newTokesnDTO = tokenUtil.rotateTokens(jwtClaimsDTO.getUsername(), jwtClaimsDTO.getRole(), jwtClaimsDTO.getSocial(), tokensDTO.getRefreshToken());
+                    TokensDTO newTokensDTO = tokenUtil.rotateTokens(jwtClaimsDTO.getUsername(), jwtClaimsDTO.getRole(), jwtClaimsDTO.getSocial(), tokensDTO.getRefreshToken());
 
                     response.setStatus(HttpServletResponse.SC_CREATED);
-                    ResponseDTO responseDTO = new ResponseDTO(ResponseStatus.REFRESH_OK, "Refresh OK", newTokesnDTO);
+                    ResponseDTO responseDTO = new ResponseDTO(ResponseStatus.REFRESH_OK, "Refresh OK", newTokensDTO);
 
                     ioUtil.writeResponseBody(response, responseDTO);
                 } else if (new AntPathRequestMatcher("/api/refresh/logout").matches(request)) {
-                    tokenUtil.invalidateToken(jwtClaimsDTO.getUsername());
+                    tokenUtil.invalidateToken(jwtClaimsDTO.getUsername(), tokensDTO.getRefreshToken());
 
                     response.setStatus(HttpServletResponse.SC_OK);
                     ResponseDTO responseDTO = new ResponseDTO();

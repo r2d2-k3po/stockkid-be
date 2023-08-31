@@ -26,8 +26,6 @@ public class ApiNaverFilter  extends OncePerRequestFilter {
     @Autowired
     private IoUtil ioUtil;
 
-
-
     private final AntPathRequestMatcher antPathRequestMatcher;
 
     private final MemberService memberService;

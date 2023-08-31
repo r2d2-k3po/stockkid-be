@@ -47,7 +47,12 @@ public class ApiAccessFilter extends OncePerRequestFilter {
 
             try {
                 String accessToken = extractTokenFromHeader(request);
-                JWTClaimsDTO jwtClaimsDTO = jwtUtil.verifyAndExtractAccessToken(accessToken);
+                JWTClaimsDTO jwtClaimsDTO = jwtUtil.verifyAndExtractToken(accessToken);
+
+                // Check if the token is refreshToken
+                if (jwtClaimsDTO.getSocial() != null) {
+                    throw new Exception("AccessToken is required");
+                }
 
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(jwtClaimsDTO.getUsername(), null, Collections.singleton(new SimpleGrantedAuthority("ROLE_" + jwtClaimsDTO.getRole())));
 

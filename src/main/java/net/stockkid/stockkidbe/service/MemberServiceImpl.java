@@ -27,15 +27,12 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public void createUser(MemberDTO dto) throws IllegalArgumentException {
 
-        log.info("DTO -------------------------");
-        log.info(dto);
 
         if (userExists(dto.getUsername())) {
             throw new IllegalArgumentException("User already exists");
         } else {
             Member entity = dtoToEntity(dto);
             entity.setPassword(passwordEncoder.encode(dto.getPassword()));
-            log.info(entity);
             memberRepository.save(entity);
         }
     }

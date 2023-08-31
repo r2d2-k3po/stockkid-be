@@ -40,16 +40,22 @@ public class TokenUtil {
 
         if (Objects.equals(refreshToken, refreshTokenDB)) {
             return generateTokens(sub, rol, soc);
-
         } else {
             memberService.updateRefreshToken(sub,null);
             throw new Exception("refreshToken invalidated");
         }
     }
 
-    public void invalidateToken(String sub) throws Exception {
+    public void invalidateToken(String sub, String refreshToken) throws Exception {
 
-        memberService.updateRefreshToken(sub, null);
+        String refreshTokenDB = memberService.loadRefreshTokenByUsername(sub);
+
+        if (Objects.equals(refreshToken, refreshTokenDB)) {
+            memberService.updateRefreshToken(sub, null);
+
+        } else {
+            throw new Exception("refreshToken not valid");
+        }
     }
 
     public String generateRandomPassword(int length) {
