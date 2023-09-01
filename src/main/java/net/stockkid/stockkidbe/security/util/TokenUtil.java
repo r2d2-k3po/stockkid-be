@@ -41,8 +41,7 @@ public class TokenUtil {
         if (Objects.equals(refreshToken, refreshTokenDB)) {
             return generateTokens(sub, rol, soc);
         } else {
-            memberService.updateRefreshToken(sub,null);
-            throw new Exception("refreshToken invalidated");
+            throw new Exception("refreshToken not valid");
         }
     }
 
@@ -52,7 +51,6 @@ public class TokenUtil {
 
         if (Objects.equals(refreshToken, refreshTokenDB)) {
             memberService.updateRefreshToken(sub, null);
-
         } else {
             throw new Exception("refreshToken not valid");
         }
