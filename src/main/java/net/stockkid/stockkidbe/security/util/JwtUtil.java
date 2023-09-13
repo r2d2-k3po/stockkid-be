@@ -25,6 +25,12 @@ public class JwtUtil {
     @Value("${jwt.base64EncodedSecretKey}")
     private String base64EncodedSecretKey;
 
+    @Value("${spring.security.oauth2.client.registration.kakao.client-id}")
+    private String kakaoClientId;
+
+    @Value("${kakao.idtoken.iss}")
+    private String kakaoIdTokenIss;
+
     //get a key by using JWTTests.java and save it in application.properties
     public static String getBase64EncodedSecretKey() {
         try {
@@ -93,5 +99,20 @@ public class JwtUtil {
         jwtClaimsDTO.setRole((String) claims.get("rol"));
         jwtClaimsDTO.setSocial((String) claims.get("soc"));
         return jwtClaimsDTO;
+    }
+
+    public String verifyAndExtractKakaoIdToken(String idTokenStr, String kakaoNonce) throws Exception {
+
+        SecretKey secretKey = getSecretKeyFromProperties();
+
+        JWTClaimsDTO jwtClaimsDTO = new JWTClaimsDTO();
+        Jwt<?, ?> jwt = Jwts.parserBuilder().setSigningKey(secretKey).build().parseClaimsJws(idTokenStr);
+
+        DefaultClaims claims = (DefaultClaims) jwt.getBody();
+
+        jwtClaimsDTO.setUsername(claims.getSubject());
+        jwtClaimsDTO.setRole((String) claims.get("rol"));
+        jwtClaimsDTO.setSocial((String) claims.get("soc"));
+        return "email";
     }
 }

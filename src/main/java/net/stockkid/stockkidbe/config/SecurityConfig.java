@@ -62,6 +62,7 @@ public class SecurityConfig {
                 .addFilterBefore(apiLoginFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(apiGoogleFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(apiNaverFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(apiKakaoFilter(), UsernamePasswordAuthenticationFilter.class)
                 .csrf((csrf) -> csrf.disable());
 
         return http.build();
@@ -107,6 +108,11 @@ public class SecurityConfig {
     @Bean
     public ApiNaverFilter apiNaverFilter() throws Exception {
         return new ApiNaverFilter(new AntPathRequestMatcher("/api/naver/**"), new MemberServiceImpl(memberRepository, passwordEncoder()));
+    }
+
+    @Bean
+    public ApiKakaoFilter apiKakaoFilter() throws Exception {
+        return new ApiKakaoFilter(new AntPathRequestMatcher("/api/kakao/**"), new MemberServiceImpl(memberRepository, passwordEncoder()));
     }
 
     @Bean

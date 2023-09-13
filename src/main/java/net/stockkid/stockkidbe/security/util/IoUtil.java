@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.BufferedReader;
@@ -33,6 +35,21 @@ public class IoUtil {
 
     @Value("${spring.security.oauth2.client.provider.naver.user-info-uri}")
     private String naverUserInfoUri;
+
+    @Value("${spring.security.oauth2.client.registration.kakao.client-id}")
+    private String kakaoClientId;
+
+    @Value("${spring.security.oauth2.client.registration.kakao.client-secret}")
+    private String kakaoClientSecret;
+
+    @Value("${spring.security.oauth2.client.registration.kakao.authorization-grant-type}")
+    private String kakaoGrantType;
+
+    @Value("${spring.security.oauth2.client.provider.kakao.token-uri}")
+    private String kakaoTokenUri;
+
+    @Value("${spring.security.oauth2.client.provider.kakao.redirect-uri}")
+    private String kakaoRedirectUri;
 
     public <T> T readRequestBody(HttpServletRequest request, Class<T> valueType) throws IOException {
 
@@ -90,5 +107,26 @@ public class IoUtil {
         log.info(naverProfileDTO);
 
         return naverProfileDTO.getResponse();
+    }
+
+    public KakaoTokenDTO getKakaoToken(String authcode) throws Exception {
+
+        MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
+        formData.add("grant_type", kakaoGrantType);
+        formData.add("client_id", kakaoClientId);
+        formData.add("redirect_uri", kakaoRedirectUri);
+        formData.add("code", authcode);
+        formData.add("client_secret", kakaoClientSecret);
+
+        WebClient webClient = WebClient.builder()
+                .baseUrl(kakaoTokenUri)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+                .build();
+
+        return webClient.post()
+                .bodyValue(formData)
+                .retrieve()
+                .bodyToMono(KakaoTokenDTO.class)
+                .block();
     }
 }
