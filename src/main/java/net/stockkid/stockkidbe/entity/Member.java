@@ -29,7 +29,7 @@ public class Member extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private @Setter MemberSocial fromSocial;
 
-    @Column
+    @Column(length = 1024)
     private @Setter String refreshToken;
 
     @Column(nullable = false)

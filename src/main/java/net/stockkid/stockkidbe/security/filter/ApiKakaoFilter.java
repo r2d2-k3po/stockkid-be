@@ -62,7 +62,7 @@ public class ApiKakaoFilter extends OncePerRequestFilter {
                     MemberDTO newMemberDTO = new MemberDTO();
                     newMemberDTO.setUsername(email);
                     newMemberDTO.setPassword(tokenUtil.generateRandomPassword(30));
-                    newMemberDTO.setFromSocial(MemberSocial.NAV);
+                    newMemberDTO.setFromSocial(MemberSocial.KKO);
 
                     log.info("create new Kakao user");
                     memberService.createUser(newMemberDTO);

@@ -48,7 +48,7 @@ public class IoUtil {
     @Value("${spring.security.oauth2.client.provider.kakao.token-uri}")
     private String kakaoTokenUri;
 
-    @Value("${spring.security.oauth2.client.provider.kakao.redirect-uri}")
+    @Value("${kakao.redirect-uri}")
     private String kakaoRedirectUri;
 
     public <T> T readRequestBody(HttpServletRequest request, Class<T> valueType) throws IOException {

@@ -14,11 +14,11 @@ public class JWTTests {
 
     //get a key and save it in application.properties
     @Test
-    public void generateBase64EncodedSecretKey() throws Exception {
+    public void generateRsaJsonWebKey() throws Exception {
 
-        String base64EncodedSecretKey = JwtUtil.getBase64EncodedSecretKey();
+        String rsaJsonWebKeyJson = JwtUtil.getRsaJsonWebKey();
 
-        System.out.println("base64EncodedSecretKey : " + base64EncodedSecretKey);
+        System.out.println("rsaJsonWebKeyJson : " + rsaJsonWebKeyJson);
     }
 
     @Test
@@ -27,7 +27,7 @@ public class JWTTests {
         String role = "USER";
         String social = "UP";
 
-        String token = jwtUtil.generateToken(username, role, social);
+        String token = jwtUtil.generateRefreshToken(username, role, social);
 
         System.out.println("token : " + token);
     }
@@ -38,13 +38,14 @@ public class JWTTests {
         String username = "jwtTestUser";
         String role = "USER";
         String social = "UP";
-        String token = jwtUtil.generateToken(username, role, social);
+        String token = jwtUtil.generateRefreshToken(username, role, social);
 
         Thread.sleep(5000);
 
-        JWTClaimsDTO jwtClaimsDTO = jwtUtil.verifyAndExtract(token);
+        JWTClaimsDTO jwtClaimsDTO = jwtUtil.verifyAndExtractToken(token);
 
         System.out.println("username : " + jwtClaimsDTO.getUsername());
         System.out.println("role : " + jwtClaimsDTO.getRole());
+        System.out.println("social : " + jwtClaimsDTO.getSocial());
     }
 }
