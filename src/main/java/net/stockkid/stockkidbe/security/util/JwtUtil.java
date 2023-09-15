@@ -28,11 +28,8 @@ public class JwtUtil {
     @Value("${kakao.idtoken.iss}")
     private String kakaoIdTokenIss;
 
-    @Value("${kakao.jwks-uri}")
-    private String kakaoJwksUri;
-
-    HttpsJwks httpsJkws = new HttpsJwks(kakaoJwksUri);
-    HttpsJwksVerificationKeyResolver httpsJwksKeyResolver = new HttpsJwksVerificationKeyResolver(httpsJkws);
+    private static final HttpsJwks httpsJkws = new HttpsJwks("https://kauth.kakao.com/.well-known/jwks.json");
+    private static final HttpsJwksVerificationKeyResolver httpsJwksKeyResolver = new HttpsJwksVerificationKeyResolver(httpsJkws);
 
     //get a key by using JWTTests.java and save it in application.properties
     public static String getRsaJsonWebKey() {
