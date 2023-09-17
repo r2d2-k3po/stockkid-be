@@ -17,8 +17,6 @@ public interface MemberService {
 
     void disableSocialUser(Long memberId);
 
-    String loadRefreshTokenByUsername(String username);
-
     void updateRefreshToken(String username, String refreshToken);
 
     boolean userExists(String username);

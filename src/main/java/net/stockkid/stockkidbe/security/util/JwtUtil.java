@@ -52,19 +52,20 @@ public class JwtUtil {
         return null;
     }
 
-    public String generateAccessToken(String sub, String rol) throws Exception {
+    public String generateAccessToken(Long sid, String rol) throws Exception {
 
         long thirtyMinutes = 30;
         RsaJsonWebKey rsaJsonWebKey = getJwkFromProperties();
 
         JwtClaims claims = new JwtClaims();
-        claims.setSubject(sub);
+        claims.setClaim("sid", sid);
         claims.setStringClaim("rol", rol);
         claims.setIssuedAtToNow();
         claims.setExpirationTimeMinutesInTheFuture(thirtyMinutes);
 
         JsonWebSignature jws = new JsonWebSignature();
         jws.setPayload(claims.toJson());
+        assert rsaJsonWebKey != null;
         jws.setKey(rsaJsonWebKey.getPrivateKey());
         jws.setKeyIdHeaderValue(rsaJsonWebKey.getKeyId());
         jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.RSA_USING_SHA256);
@@ -86,6 +87,7 @@ public class JwtUtil {
 
         JsonWebSignature jws = new JsonWebSignature();
         jws.setPayload(claims.toJson());
+        assert rsaJsonWebKey != null;
         jws.setKey(rsaJsonWebKey.getPrivateKey());
         jws.setKeyIdHeaderValue(rsaJsonWebKey.getKeyId());
         jws.setAlgorithmHeaderValue(AlgorithmIdentifiers.RSA_USING_SHA256);
@@ -97,10 +99,10 @@ public class JwtUtil {
 
         RsaJsonWebKey rsaJsonWebKey = getJwkFromProperties();
 
+        assert rsaJsonWebKey != null;
         JwtConsumer jwtConsumer = new JwtConsumerBuilder()
                 .setRequireExpirationTime()
                 .setAllowedClockSkewInSeconds(30)
-                .setRequireSubject()
                 .setVerificationKey(rsaJsonWebKey.getKey())
                 .setJwsAlgorithmConstraints(AlgorithmConstraints.ConstraintType.PERMIT, AlgorithmIdentifiers.RSA_USING_SHA256)
                 .build();
@@ -108,6 +110,7 @@ public class JwtUtil {
         JwtClaims claims = jwtConsumer.processToClaims(tokenStr);
 
         JWTClaimsDTO jwtClaimsDTO = new JWTClaimsDTO();
+        jwtClaimsDTO.setMemberId((Long) claims.getClaimValue("sid"));
         jwtClaimsDTO.setUsername(claims.getSubject());
         jwtClaimsDTO.setRole(claims.getStringClaimValue("rol"));
         jwtClaimsDTO.setSocial(claims.getStringClaimValue("soc"));

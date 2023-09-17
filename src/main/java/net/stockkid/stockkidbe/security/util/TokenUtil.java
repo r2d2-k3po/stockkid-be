@@ -2,9 +2,9 @@ package net.stockkid.stockkidbe.security.util;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import net.stockkid.stockkidbe.dto.MemberDTO;
 import net.stockkid.stockkidbe.dto.TokensDTO;
 import net.stockkid.stockkidbe.service.MemberService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.security.SecureRandom;
@@ -15,15 +15,18 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class TokenUtil {
 
-    @Autowired
-    private JwtUtil jwtUtil;
+    private final JwtUtil jwtUtil;
 
     private final MemberService memberService;
 
-    public TokensDTO generateTokens(String sub, String rol, String soc) throws Exception {
+    public TokensDTO generateTokens(Long sid, String sub, String rol, String soc) throws Exception {
 
         TokensDTO tokensDTO = new TokensDTO();
-        tokensDTO.setAccessToken(jwtUtil.generateAccessToken(sub, rol));
+
+        if (sid == null) {
+            sid = memberService.loadUserByUsername(sub).getMemberId();
+        }
+        tokensDTO.setAccessToken(jwtUtil.generateAccessToken(sid, rol));
         tokensDTO.setRefreshToken(jwtUtil.generateRefreshToken(sub, rol, soc));
 
         log.info("successful accessToken : " + tokensDTO.getAccessToken());
@@ -36,10 +39,10 @@ public class TokenUtil {
 
     public TokensDTO rotateTokens(String sub, String rol, String soc, String refreshToken) throws Exception {
 
-        String refreshTokenDB = memberService.loadRefreshTokenByUsername(sub);
+        MemberDTO memberDTO = memberService.loadUserByUsername(sub);
 
-        if (Objects.equals(refreshToken, refreshTokenDB)) {
-            return generateTokens(sub, rol, soc);
+        if (Objects.equals(refreshToken, memberDTO.getRefreshToken())) {
+            return generateTokens(memberDTO.getMemberId(), sub, rol, soc);
         } else {
             throw new Exception("refreshToken not valid");
         }
@@ -47,7 +50,7 @@ public class TokenUtil {
 
     public void invalidateToken(String sub, String refreshToken) throws Exception {
 
-        String refreshTokenDB = memberService.loadRefreshTokenByUsername(sub);
+        String refreshTokenDB = memberService.loadUserByUsername(sub).getRefreshToken();
 
         if (Objects.equals(refreshToken, refreshTokenDB)) {
             memberService.updateRefreshToken(sub, null);

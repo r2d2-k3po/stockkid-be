@@ -1,7 +1,6 @@
 package net.stockkid.stockkidbe.security.filter;
 
 import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.log4j.Log4j2;
@@ -35,7 +34,7 @@ public class ApiLoginFilter extends AbstractAuthenticationProcessingFilter {
     }
 
     @Override
-    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
+    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException {
 
         log.info("ApiLoginFilter------------------------");
         log.info("attemptAuthentication");
@@ -48,7 +47,7 @@ public class ApiLoginFilter extends AbstractAuthenticationProcessingFilter {
     }
 
     @Override
-    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain, Authentication authResult) throws IOException, ServletException {
+    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain, Authentication authResult) {
 
         log.info("successfulAuthentication : " + authResult);
         log.info(authResult.getPrincipal());
@@ -58,7 +57,7 @@ public class ApiLoginFilter extends AbstractAuthenticationProcessingFilter {
         String role = authResult.getAuthorities().iterator().next().getAuthority().substring(5);
 
         try {
-            TokensDTO tokensDTO = tokenUtil.generateTokens(username, role, MemberSocial.UP.name());
+            TokensDTO tokensDTO = tokenUtil.generateTokens(null, username, role, MemberSocial.UP.name());
 
             response.setStatus(HttpServletResponse.SC_CREATED);
             ResponseDTO responseDTO = new ResponseDTO(ResponseStatus.LOGIN_OK, "Login OK", tokensDTO);

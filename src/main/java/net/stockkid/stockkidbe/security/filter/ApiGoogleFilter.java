@@ -98,7 +98,7 @@ public class ApiGoogleFilter extends OncePerRequestFilter {
                     memberService.createUser(newMemberDTO);
 
                     log.info("create tokens for new user");
-                    TokensDTO tokensDTO = tokenUtil.generateTokens(email, MemberRole.USER.name(), MemberSocial.GGL.name());
+                    TokensDTO tokensDTO = tokenUtil.generateTokens(null, email, MemberRole.USER.name(), MemberSocial.GGL.name());
 
                     response.setStatus(HttpServletResponse.SC_CREATED);
                     ResponseDTO responseDTO = new ResponseDTO(ResponseStatus.LOGIN_OK, "Login OK", tokensDTO);
@@ -113,7 +113,7 @@ public class ApiGoogleFilter extends OncePerRequestFilter {
 
                     if (new AntPathRequestMatcher("/api/google/member/signin").matches(request)) {
                         log.info("create tokens for existing user");
-                        TokensDTO tokensDTO = tokenUtil.generateTokens(email, memberDTO.getMemberRole().name(), MemberSocial.GGL.name());
+                        TokensDTO tokensDTO = tokenUtil.generateTokens(memberDTO.getMemberId(), email, memberDTO.getMemberRole().name(), MemberSocial.GGL.name());
 
                         response.setStatus(HttpServletResponse.SC_OK);
                         ResponseDTO responseDTO = new ResponseDTO(ResponseStatus.LOGIN_OK, "Login OK", tokensDTO);

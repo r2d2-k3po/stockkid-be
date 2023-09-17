@@ -81,7 +81,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public ApiLoginFilter apiLoginFilter() throws Exception {
+    public ApiLoginFilter apiLoginFilter() {
 
         ApiLoginFilter apiLoginFilter = new ApiLoginFilter("/api/member/login");
         apiLoginFilter.setAuthenticationManager(authenticationManager());
@@ -91,27 +91,27 @@ public class SecurityConfig {
     }
 
     @Bean
-    public ApiAccessFilter apiAccessFilter() throws Exception {
+    public ApiAccessFilter apiAccessFilter() {
         return new ApiAccessFilter(new AntPathRequestMatcher("/api/access/**"));
     }
 
     @Bean
-    public ApiRefreshFilter apiRefreshFilter() throws Exception {
+    public ApiRefreshFilter apiRefreshFilter() {
         return new ApiRefreshFilter(new AntPathRequestMatcher("/api/refresh/**"));
     }
 
     @Bean
-    public ApiGoogleFilter apiGoogleFilter() throws Exception {
+    public ApiGoogleFilter apiGoogleFilter() {
         return new ApiGoogleFilter(new AntPathRequestMatcher("/api/google/**"), new MemberServiceImpl(memberRepository, passwordEncoder()));
     }
 
     @Bean
-    public ApiNaverFilter apiNaverFilter() throws Exception {
+    public ApiNaverFilter apiNaverFilter() {
         return new ApiNaverFilter(new AntPathRequestMatcher("/api/naver/**"), new MemberServiceImpl(memberRepository, passwordEncoder()));
     }
 
     @Bean
-    public ApiKakaoFilter apiKakaoFilter() throws Exception {
+    public ApiKakaoFilter apiKakaoFilter() {
         return new ApiKakaoFilter(new AntPathRequestMatcher("/api/kakao/**"), new MemberServiceImpl(memberRepository, passwordEncoder()));
     }
 

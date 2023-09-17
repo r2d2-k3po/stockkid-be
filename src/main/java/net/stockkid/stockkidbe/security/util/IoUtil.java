@@ -72,7 +72,7 @@ public class IoUtil {
         writer.print(jsonBody);
     }
 
-    public NaverTokenDTO getNaverToken(AuthcodeDTO authcodeDTO) throws Exception {
+    public NaverTokenDTO getNaverToken(AuthcodeDTO authcodeDTO) {
 
         WebClient webClient = WebClient.builder()
                 .baseUrl(naverTokenUri)
@@ -92,7 +92,7 @@ public class IoUtil {
                 .block();
     }
 
-    public NaverUserInfoDTO getNaverUserInfo(String access_token) throws Exception {
+    public NaverUserInfoDTO getNaverUserInfo(String access_token) {
 
         WebClient webClient = WebClient.builder()
                 .baseUrl(naverUserInfoUri)
@@ -106,10 +106,11 @@ public class IoUtil {
                 .block();
         log.info(naverProfileDTO);
 
+        assert naverProfileDTO != null;
         return naverProfileDTO.getResponse();
     }
 
-    public KakaoTokenDTO getKakaoToken(String authcode) throws Exception {
+    public KakaoTokenDTO getKakaoToken(String authcode) {
 
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add("grant_type", kakaoGrantType);

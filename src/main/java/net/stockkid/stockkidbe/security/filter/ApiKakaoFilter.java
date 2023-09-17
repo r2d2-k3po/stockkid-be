@@ -68,7 +68,7 @@ public class ApiKakaoFilter extends OncePerRequestFilter {
                     memberService.createUser(newMemberDTO);
 
                     log.info("create tokens for new user");
-                    TokensDTO tokensDTO = tokenUtil.generateTokens(email, MemberRole.USER.name(), MemberSocial.KKO.name());
+                    TokensDTO tokensDTO = tokenUtil.generateTokens(null, email, MemberRole.USER.name(), MemberSocial.KKO.name());
 
                     response.setStatus(HttpServletResponse.SC_CREATED);
                     ResponseDTO responseDTO = new ResponseDTO(ResponseStatus.LOGIN_OK, "Login OK", tokensDTO);
@@ -83,7 +83,7 @@ public class ApiKakaoFilter extends OncePerRequestFilter {
 
                     if (new AntPathRequestMatcher("/api/kakao/member/signin").matches(request)) {
                         log.info("create tokens for existing user");
-                        TokensDTO tokensDTO = tokenUtil.generateTokens(email, memberDTO.getMemberRole().name(), MemberSocial.KKO.name());
+                        TokensDTO tokensDTO = tokenUtil.generateTokens(memberDTO.getMemberId(), email, memberDTO.getMemberRole().name(), MemberSocial.KKO.name());
 
                         response.setStatus(HttpServletResponse.SC_OK);
                         ResponseDTO responseDTO = new ResponseDTO(ResponseStatus.LOGIN_OK, "Login OK", tokensDTO);

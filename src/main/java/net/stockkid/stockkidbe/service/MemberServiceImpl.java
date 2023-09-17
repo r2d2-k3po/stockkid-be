@@ -75,11 +75,11 @@ public class MemberServiceImpl implements MemberService {
 
     //USER
     @Override
-    public void changePassword(String oldPassword, String newPassword) throws UsernameNotFoundException, BadCredentialsException {
+    public void changePassword(String oldPassword, String newPassword) throws IllegalArgumentException, BadCredentialsException {
 
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        Optional<Member> optionalUser = memberRepository.findByUsername(username);
-        Member existingUser = optionalUser.orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        Long memberId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Optional<Member> optionalUser = memberRepository.findById(memberId);
+        Member existingUser = optionalUser.orElseThrow(() -> new IllegalArgumentException("memberId not found"));
 
         if (passwordEncoder.matches(oldPassword, existingUser.getPassword())) {
             existingUser.setPassword(passwordEncoder.encode(newPassword));
@@ -91,11 +91,11 @@ public class MemberServiceImpl implements MemberService {
 
     //USER
     @Override
-    public void disableUser(String password) throws UsernameNotFoundException, BadCredentialsException {
+    public void disableUser(String password) throws IllegalArgumentException, BadCredentialsException {
 
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        Optional<Member> optionalUser = memberRepository.findByUsername(username);
-        Member existingUser = optionalUser.orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        Long memberId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Optional<Member> optionalUser = memberRepository.findById(memberId);
+        Member existingUser = optionalUser.orElseThrow(() -> new IllegalArgumentException("memberId not found"));
 
         if (passwordEncoder.matches(password, existingUser.getPassword())) {
             existingUser.setEnabled(false);
@@ -112,14 +112,6 @@ public class MemberServiceImpl implements MemberService {
 
         existingUser.setEnabled(false);
         memberRepository.save(existingUser);
-    }
-
-    @Override
-    public String loadRefreshTokenByUsername(String username) throws IllegalArgumentException {
-        Optional<Member> optionalUser = memberRepository.findByUsername(username);
-        Member existingUser = optionalUser.orElseThrow(() -> new IllegalArgumentException("User not found"));
-
-        return existingUser.getRefreshToken();
     }
 
     @Override
