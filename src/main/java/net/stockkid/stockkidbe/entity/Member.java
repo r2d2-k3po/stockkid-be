@@ -43,4 +43,8 @@ public class Member extends BaseEntity {
 
     @Column(nullable = false)
     private @Setter boolean enabled;
+
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @MapsId
+    private MemberSettings memberSettings;
 }
