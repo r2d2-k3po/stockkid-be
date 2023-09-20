@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.stockkid.stockkidbe.entity.MemberRole;
 import net.stockkid.stockkidbe.repository.MemberRepository;
+import net.stockkid.stockkidbe.repository.MemberSettingsRepository;
 import net.stockkid.stockkidbe.security.filter.*;
 import net.stockkid.stockkidbe.security.handler.ApiLoginFailureHandler;
 import net.stockkid.stockkidbe.security.service.UserDetailsServiceImpl;
@@ -39,6 +40,8 @@ public class SecurityConfig {
 
     private final MemberRepository memberRepository;
 
+    private final MemberSettingsRepository memberSettingsRepository;
+
     @Bean
     static RoleHierarchy roleHierarchy() {
         var hierarchy = new RoleHierarchyImpl();
@@ -53,9 +56,8 @@ public class SecurityConfig {
                 .cors(withDefaults())
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/api/member/signup").permitAll()
-                        .requestMatchers("/api/access/member/changePassword").hasRole("USER")
-                        .requestMatchers("/api/access/member/deleteAccount").hasRole("USER")
-                        .anyRequest().authenticated()
+                        .requestMatchers("/api/access/**").hasRole("USER")
+                        .anyRequest().denyAll()
                 )
                 .addFilterBefore(apiAccessFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(apiRefreshFilter(), UsernamePasswordAuthenticationFilter.class)
@@ -102,17 +104,17 @@ public class SecurityConfig {
 
     @Bean
     public ApiGoogleFilter apiGoogleFilter() {
-        return new ApiGoogleFilter(new AntPathRequestMatcher("/api/google/**"), new MemberServiceImpl(memberRepository, passwordEncoder()));
+        return new ApiGoogleFilter(new AntPathRequestMatcher("/api/google/**"), new MemberServiceImpl(memberRepository, memberSettingsRepository, passwordEncoder()));
     }
 
     @Bean
     public ApiNaverFilter apiNaverFilter() {
-        return new ApiNaverFilter(new AntPathRequestMatcher("/api/naver/**"), new MemberServiceImpl(memberRepository, passwordEncoder()));
+        return new ApiNaverFilter(new AntPathRequestMatcher("/api/naver/**"), new MemberServiceImpl(memberRepository, memberSettingsRepository, passwordEncoder()));
     }
 
     @Bean
     public ApiKakaoFilter apiKakaoFilter() {
-        return new ApiKakaoFilter(new AntPathRequestMatcher("/api/kakao/**"), new MemberServiceImpl(memberRepository, passwordEncoder()));
+        return new ApiKakaoFilter(new AntPathRequestMatcher("/api/kakao/**"), new MemberServiceImpl(memberRepository, memberSettingsRepository, passwordEncoder()));
     }
 
     @Bean

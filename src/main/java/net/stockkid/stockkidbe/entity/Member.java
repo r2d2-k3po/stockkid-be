@@ -1,12 +1,9 @@
 package net.stockkid.stockkidbe.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.NaturalId;
-import org.hibernate.annotations.NaturalIdCache;
-
-import static org.hibernate.annotations.CacheConcurrencyStrategy.READ_WRITE;
 
 @Entity
 @ToString
@@ -14,46 +11,43 @@ import static org.hibernate.annotations.CacheConcurrencyStrategy.READ_WRITE;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Cache(usage = READ_WRITE)
-@NaturalIdCache
 public class Member extends BaseEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long memberId;
 
-    @Column(nullable = false)
+    @NotNull
     @NaturalId
     private String username;
 
-    @Column(nullable = false)
+    @NotNull
     private @Setter String password;
 
-    @Column(nullable = false)
+    @NotNull
     @Enumerated(EnumType.STRING)
     private @Setter MemberRole memberRole;
 
-    @Column(nullable = false)
+    @NotNull
     @Enumerated(EnumType.STRING)
     private @Setter MemberSocial fromSocial;
 
     @Column(length = 1024)
     private @Setter String refreshToken;
 
-    @Column(nullable = false)
+    @NotNull
     private @Setter boolean accountNonExpired;
 
-    @Column(nullable = false)
+    @NotNull
     private @Setter boolean accountNonLocked;
 
-    @Column(nullable = false)
+    @NotNull
     private @Setter boolean credentialsNonExpired;
 
-    @Column(nullable = false)
+    @NotNull
     private @Setter boolean enabled;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, optional = false, fetch = FetchType.LAZY)
     @MapsId
-//    @ToString.Exclude
+    @ToString.Exclude
     private @Setter MemberSettings memberSettings;
 }

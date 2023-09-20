@@ -13,4 +13,5 @@ import org.springframework.stereotype.Service;
 public class MemberSettingsServiceImpl  implements MemberSettingsService{
 
     private final MemberSettingsRepository memberSettingsRepository;
+
 }

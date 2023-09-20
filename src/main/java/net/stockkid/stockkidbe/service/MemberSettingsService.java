@@ -1,11 +1,10 @@
 package net.stockkid.stockkidbe.service;
 
-import net.stockkid.stockkidbe.dto.MemberDTO;
 import net.stockkid.stockkidbe.dto.MemberSettingsDTO;
-import net.stockkid.stockkidbe.entity.Member;
 import net.stockkid.stockkidbe.entity.MemberSettings;
 
 public interface MemberSettingsService {
+
 
     default MemberSettings dtoToEntity(MemberSettingsDTO dto) {
         return MemberSettings.builder()

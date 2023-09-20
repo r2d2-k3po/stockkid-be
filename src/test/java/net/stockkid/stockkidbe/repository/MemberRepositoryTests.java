@@ -46,10 +46,11 @@ public class MemberRepositoryTests {
 
     @Test
     public void testRead() {
-        Optional<Member> result = memberRepository.findById(25L);
+        Optional<Member> result = memberRepository.findById(1L);
 
         Member member = result.get();
         System.out.println(member);
+        System.out.println(member.getMemberSettings());
 //        System.out.println(member.getMemberSettings());
     }
 }
