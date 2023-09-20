@@ -46,9 +46,10 @@ public class MemberRepositoryTests {
 
     @Test
     public void testRead() {
-        Optional<Member> result = memberRepository.findByUsername("user1");
+        Optional<Member> result = memberRepository.findById(25L);
 
         Member member = result.get();
         System.out.println(member);
+//        System.out.println(member.getMemberSettings());
     }
 }

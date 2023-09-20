@@ -19,6 +19,7 @@ public class MemberSettings {
 
     @Lob
     @Column
+    @ToString.Exclude
     private @Setter String screenSetting1;
 
     @Column
@@ -26,6 +27,7 @@ public class MemberSettings {
 
     @Lob
     @Column
+    @ToString.Exclude
     private @Setter String screenSetting2;
 
     @Column
@@ -33,5 +35,6 @@ public class MemberSettings {
 
     @Lob
     @Column
+    @ToString.Exclude
     private @Setter String screenSetting3;
 }

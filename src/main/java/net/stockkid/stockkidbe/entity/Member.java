@@ -2,6 +2,11 @@ package net.stockkid.stockkidbe.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.NaturalId;
+import org.hibernate.annotations.NaturalIdCache;
+
+import static org.hibernate.annotations.CacheConcurrencyStrategy.READ_WRITE;
 
 @Entity
 @ToString
@@ -9,13 +14,16 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Cache(usage = READ_WRITE)
+@NaturalIdCache
 public class Member extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long memberId;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
+    @NaturalId
     private String username;
 
     @Column(nullable = false)
@@ -44,7 +52,8 @@ public class Member extends BaseEntity {
     @Column(nullable = false)
     private @Setter boolean enabled;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL)
     @MapsId
-    private MemberSettings memberSettings;
+//    @ToString.Exclude
+    private @Setter MemberSettings memberSettings;
 }

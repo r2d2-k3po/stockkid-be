@@ -39,6 +39,9 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 
+	implementation group: 'org.hibernate', name: 'hibernate-core', version: '5.6.15.Final'
+	implementation group: 'org.hibernate', name: 'hibernate-ehcache', version: '5.6.15.Final'
+
 	implementation group: 'com.google.api-client', name: 'google-api-client', version: '2.2.0'
 	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-webflux', version: '3.1.3'
 
