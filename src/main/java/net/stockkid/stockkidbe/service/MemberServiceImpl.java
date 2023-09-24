@@ -28,7 +28,7 @@ public class MemberServiceImpl implements MemberService {
 
     // permitAll
     @Override
-    public void createUser(MemberDTO dto) throws IllegalArgumentException {
+    public void createUser(MemberDTO dto) {
 
         if (userExists(dto.getUsername())) {
             throw new IllegalArgumentException("User already exists");
@@ -45,7 +45,7 @@ public class MemberServiceImpl implements MemberService {
 
     // ADMIN
     @Override
-    public void updateUser(MemberDTO dto) throws IllegalArgumentException, UsernameNotFoundException {
+    public void updateUser(MemberDTO dto) {
 
         Member existingUser;
         if (dto.getMemberId() == null) {
@@ -70,7 +70,7 @@ public class MemberServiceImpl implements MemberService {
 
     // ADMIN
     @Override
-    public void deleteUser(String username) throws UsernameNotFoundException {
+    public void deleteUser(String username) {
 
         Optional<Member> optionalUser = memberRepository.findByUsername(username);
         Member user = optionalUser.orElseThrow(() -> new UsernameNotFoundException("User not found"));
@@ -81,7 +81,7 @@ public class MemberServiceImpl implements MemberService {
 
     //USER
     @Override
-    public void changePassword(String oldPassword, String newPassword) throws IllegalArgumentException, BadCredentialsException {
+    public void changePassword(String oldPassword, String newPassword) {
 
         Long memberId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Member> optionalUser = memberRepository.findById(memberId);
@@ -97,7 +97,7 @@ public class MemberServiceImpl implements MemberService {
 
     //USER
     @Override
-    public void disableUser(String password) throws IllegalArgumentException, BadCredentialsException {
+    public void disableUser(String password) {
 
         Long memberId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Optional<Member> optionalUser = memberRepository.findById(memberId);
@@ -112,7 +112,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public void disableSocialUser(Long memberId) throws IllegalArgumentException {
+    public void disableSocialUser(Long memberId) {
         Optional<Member> optionalUser = memberRepository.findById(memberId);
         Member existingUser = optionalUser.orElseThrow(() -> new IllegalArgumentException("memberId not found"));
 
@@ -121,7 +121,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public void updateRefreshToken(String username, String refreshToken) throws IllegalArgumentException {
+    public void updateRefreshToken(String username, String refreshToken) {
         Optional<Member> optionalUser = memberRepository.findByUsername(username);
         Member existingUser = optionalUser.orElseThrow(() -> new IllegalArgumentException("User not found"));
 
