@@ -7,7 +7,6 @@ import net.stockkid.stockkidbe.dto.MemberDTO;
 import net.stockkid.stockkidbe.entity.Member;
 import net.stockkid.stockkidbe.entity.MemberSettings;
 import net.stockkid.stockkidbe.repository.MemberRepository;
-import net.stockkid.stockkidbe.repository.MemberSettingsRepository;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -23,7 +22,6 @@ import java.util.Optional;
 public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
-    private final MemberSettingsRepository memberSettingsRepository;
     private final PasswordEncoder passwordEncoder;
 
     // permitAll
@@ -33,12 +31,10 @@ public class MemberServiceImpl implements MemberService {
         if (userExists(dto.getUsername())) {
             throw new IllegalArgumentException("User already exists");
         } else {
-            MemberSettings memberSettings = new MemberSettings();
-            memberSettingsRepository.save(memberSettings);
-
             Member member = dtoToEntity(dto);
             member.setPassword(passwordEncoder.encode(dto.getPassword()));
-            member.setMemberSettings(memberSettings);
+
+            member.setMemberSettings(new MemberSettings());
             memberRepository.save(member);
         }
     }

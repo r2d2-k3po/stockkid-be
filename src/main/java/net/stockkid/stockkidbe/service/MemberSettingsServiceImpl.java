@@ -20,7 +20,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @Transactional
-public class MemberSettingsServiceImpl  implements MemberSettingsService{
+public class MemberSettingsServiceImpl implements MemberSettingsService {
 
     private final MemberSettingsRepository memberSettingsRepository;
 
@@ -53,7 +53,7 @@ public class MemberSettingsServiceImpl  implements MemberSettingsService{
         MemberSettings existingMemberSettings = optionalMemberSettings.orElseThrow(() -> new IllegalArgumentException("memberId not found"));
 
         String getterNameScreenSetting = "getScreenSetting" + number;
-        Method getterMethodScreenSetting = MemberSettings.class.getMethod(getterNameScreenSetting, String.class);
+        Method getterMethodScreenSetting = MemberSettings.class.getMethod(getterNameScreenSetting);
 
         ScreenSettingDTO screenSettingDTO = new ScreenSettingDTO();
         String screenSetting = (String) getterMethodScreenSetting.invoke(existingMemberSettings);
@@ -69,7 +69,7 @@ public class MemberSettingsServiceImpl  implements MemberSettingsService{
         MemberSettings existingMemberSettings = optionalMemberSettings.orElseThrow(() -> new IllegalArgumentException("memberId not found"));
 
         String getterNameScreenSetting = "getScreenSetting" + number;
-        Method getterMethodScreenSetting = MemberSettings.class.getMethod(getterNameScreenSetting, String.class);
+        Method getterMethodScreenSetting = MemberSettings.class.getMethod(getterNameScreenSetting);
 
         ScreenSettingDTO screenSettingDTO = new ScreenSettingDTO();
         String screenSetting = (String) getterMethodScreenSetting.invoke(existingMemberSettings);
