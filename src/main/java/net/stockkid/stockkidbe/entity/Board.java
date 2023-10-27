@@ -19,6 +19,12 @@ public class Board extends BaseEntity {
     @NotNull
     private @Setter Long memberId;
 
+    @Column
+    private @Setter Long rootId;
+
+    @Column
+    private @Setter Long parentId;
+
     @NotNull
     private @Setter String nickname;
 
@@ -29,4 +35,8 @@ public class Board extends BaseEntity {
     @Column
     @ToString.Exclude
     private @Setter String content;
+
+    @Column
+    private @Setter int replyCount;
+
 }
