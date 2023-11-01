@@ -25,9 +25,7 @@ public interface MemberService {
 
     default Member dtoToEntity(MemberDTO dto) {
         return Member.builder()
-                .memberId(dto.getMemberId())
                 .username(dto.getUsername())
-                .password(dto.getPassword())
                 .memberRole(dto.getMemberRole())
                 .accountNonExpired(dto.isAccountNonExpired())
                 .accountNonLocked(dto.isAccountNonLocked())
