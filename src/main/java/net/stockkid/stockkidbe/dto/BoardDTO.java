@@ -1,6 +1,5 @@
 package net.stockkid.stockkidbe.dto;
 
-import jakarta.persistence.Column;
 import lombok.*;
 import net.stockkid.stockkidbe.entity.BoardCategory;
 

@@ -10,5 +10,6 @@ public enum ResponseStatus {
     PW_CH_OK, PW_CH_FAIL,
     AC_DL_OK, AC_DL_FAIL,
     SAVE_OK, SAVE_FAIL,
-    LOAD_OK, LOAD_FAIL
+    LOAD_OK, LOAD_FAIL,
+    WRITE_OK, WRITE_FAIL
 }

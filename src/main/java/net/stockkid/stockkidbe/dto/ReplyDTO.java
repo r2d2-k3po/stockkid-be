@@ -7,9 +7,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class ResponseDTO {
+public class ReplyDTO {
 
-    private ResponseStatus apiStatus;
-    private String apiMsg;
-    private Object apiObj;
+    private Long rootId;
+    private Long parentId;
+    private String nickname;
+    private String content;
 }

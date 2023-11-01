@@ -6,7 +6,6 @@ import lombok.*;
 @Entity
 @ToString
 @Getter
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class MemberSettings {

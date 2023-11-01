@@ -1,9 +1,15 @@
 package net.stockkid.stockkidbe.service;
 
 import net.stockkid.stockkidbe.dto.BoardDTO;
+import net.stockkid.stockkidbe.dto.PostDTO;
+import net.stockkid.stockkidbe.dto.ReplyDTO;
 import net.stockkid.stockkidbe.entity.Board;
 
 public interface BoardService {
+
+    void registerPost(PostDTO dto);
+
+    void registerReply(ReplyDTO dto);
 
     default Board dtoToEntity(BoardDTO dto) {
         return Board.builder()

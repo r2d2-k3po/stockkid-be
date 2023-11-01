@@ -26,7 +26,7 @@ public class Board extends BaseEntity {
     @NotNull
     private @Setter Long memberId;
 
-    @NotNull
+    @Column
     private @Setter Long rootId;
 
     @Column
