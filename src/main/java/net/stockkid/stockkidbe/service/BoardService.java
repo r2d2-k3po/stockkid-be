@@ -9,7 +9,11 @@ public interface BoardService {
 
     void registerPost(PostDTO dto);
 
+    void modifyPost(PostDTO dto);
+
     void registerReply(ReplyDTO dto);
+
+    void modifyReply(ReplyDTO dto);
 
     default Board dtoToEntity(BoardDTO dto) {
         return Board.builder()

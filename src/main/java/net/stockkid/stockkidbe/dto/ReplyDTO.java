@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 public class ReplyDTO {
 
+    private Long boardId;
     private Long rootId;
     private Long parentId;
     private String nickname;

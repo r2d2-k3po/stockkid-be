@@ -11,6 +11,7 @@ import net.stockkid.stockkidbe.repository.BoardRepository;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
 import java.util.Optional;
 
 @Log4j2
@@ -44,6 +45,27 @@ public class BoardServiceImpl implements BoardService{
     }
 
     @Override
+    public void modifyPost(PostDTO dto) {
+
+        Long memberId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        Optional<Board> optionalPost = boardRepository.findById(dto.getBoardId());
+        Board existingPost = optionalPost.orElseThrow(() -> new IllegalArgumentException("boardId not found"));
+
+        if (Objects.equals(existingPost.getMemberId(), memberId)) {
+            existingPost.setBoardCategory(BoardCategory.valueOf(dto.getBoardCategory()));
+            existingPost.setNickname(dto.getNickname());
+            existingPost.setTitle(dto.getTitle());
+            existingPost.setContent(dto.getContent());
+            existingPost.setTag1(dto.getTag1());
+            existingPost.setTag2(dto.getTag2());
+            existingPost.setTag3(dto.getTag3());
+
+            boardRepository.save(existingPost);
+        } else throw new IllegalArgumentException("memberId not match");
+    }
+
+    @Override
     public void registerReply(ReplyDTO dto) {
 
         Optional<Board> optionalPost = boardRepository.findById(dto.getRootId());
@@ -63,5 +85,21 @@ public class BoardServiceImpl implements BoardService{
 
         existingPost.setReplyCount(existingPost.getReplyCount() + 1);
         boardRepository.save(existingPost);
+    }
+
+    @Override
+    public void modifyReply(ReplyDTO dto) {
+
+        Long memberId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        Optional<Board> optionalReply = boardRepository.findById(dto.getBoardId());
+        Board existingReply = optionalReply.orElseThrow(() -> new IllegalArgumentException("boardId not found"));
+
+        if (Objects.equals(existingReply.getMemberId(), memberId)) {
+            existingReply.setNickname(dto.getNickname());
+            existingReply.setContent(dto.getContent());
+
+            boardRepository.save(existingReply);
+        } else throw new IllegalArgumentException("memberId not match");
     }
 }
