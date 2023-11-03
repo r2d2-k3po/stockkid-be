@@ -11,5 +11,6 @@ public enum ResponseStatus {
     AC_DL_OK, AC_DL_FAIL,
     SAVE_OK, SAVE_FAIL,
     LOAD_OK, LOAD_FAIL,
-    WRITE_OK, WRITE_FAIL
+    WRITE_OK, WRITE_FAIL,
+    READ_OK, READ_FAIL
 }

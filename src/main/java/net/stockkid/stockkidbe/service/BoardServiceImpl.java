@@ -102,4 +102,22 @@ public class BoardServiceImpl implements BoardService{
             boardRepository.save(existingReply);
         } else throw new IllegalArgumentException("memberId not match");
     }
+
+    @Override
+    public void delete(Long boardId) {
+
+        Long memberId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        Optional<Board> optionalBoard = boardRepository.findById(boardId);
+        Board existingBoard = optionalBoard.orElseThrow(() -> new IllegalArgumentException("boardId not found"));
+
+        if (Objects.equals(existingBoard.getMemberId(), memberId)) {
+            if (existingBoard.getRootId() == null) {
+                existingBoard.setTitle("deleted");
+            }
+            existingBoard.setContent("deleted");
+
+            boardRepository.save(existingBoard);
+        } else throw new IllegalArgumentException("memberId not match");
+    }
 }

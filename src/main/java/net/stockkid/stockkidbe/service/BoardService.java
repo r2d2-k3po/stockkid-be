@@ -15,6 +15,8 @@ public interface BoardService {
 
     void modifyReply(ReplyDTO dto);
 
+    void delete(Long boardId);
+
     default Board dtoToEntity(BoardDTO dto) {
         return Board.builder()
                 .boardId(dto.getBoardId())

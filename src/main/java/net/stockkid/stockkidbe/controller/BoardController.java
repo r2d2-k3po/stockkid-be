@@ -109,4 +109,26 @@ public class BoardController {
         }
     }
 
+    @PatchMapping("/delete/{boardId}")
+    public ResponseEntity<ResponseDTO> loadScreenSetting(@PathVariable("boardId") String boardId) {
+
+        log.info("--------------delete boardId--------------");
+
+        ResponseDTO responseDTO = new ResponseDTO();
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
+
+        try {
+            boardService.delete(Long.parseLong(boardId));
+            responseDTO.setApiStatus(ResponseStatus.WRITE_OK);
+            responseDTO.setApiMsg("Write OK");
+            return new ResponseEntity<>(responseDTO, httpHeaders, HttpStatus.OK);
+        } catch (Exception e) {
+            log.info("Write Error : " + e.getMessage());
+            responseDTO.setApiStatus(ResponseStatus.WRITE_FAIL);
+            responseDTO.setApiMsg(e.getMessage());
+            return new ResponseEntity<>(responseDTO, httpHeaders, HttpStatus.CONFLICT);
+        }
+    }
+
 }
