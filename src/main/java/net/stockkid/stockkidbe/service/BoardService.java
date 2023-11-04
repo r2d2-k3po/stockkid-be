@@ -1,6 +1,7 @@
 package net.stockkid.stockkidbe.service;
 
 import net.stockkid.stockkidbe.dto.BoardDTO;
+import net.stockkid.stockkidbe.dto.BoardPageDTO;
 import net.stockkid.stockkidbe.dto.PostDTO;
 import net.stockkid.stockkidbe.dto.ReplyDTO;
 import net.stockkid.stockkidbe.entity.Board;
@@ -16,6 +17,8 @@ public interface BoardService {
     void modifyReply(ReplyDTO dto);
 
     void delete(Long boardId);
+
+    BoardPageDTO readPage(int page, int size, String boardCategory, String sortBy);
 
     default Board dtoToEntity(BoardDTO dto) {
         return Board.builder()

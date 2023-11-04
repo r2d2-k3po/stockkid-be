@@ -3,17 +3,22 @@ package net.stockkid.stockkidbe.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import net.stockkid.stockkidbe.dto.BoardPageDTO;
 import net.stockkid.stockkidbe.dto.PostDTO;
 import net.stockkid.stockkidbe.dto.ReplyDTO;
 import net.stockkid.stockkidbe.entity.Board;
 import net.stockkid.stockkidbe.entity.BoardCategory;
 import net.stockkid.stockkidbe.repository.BoardRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
-import java.util.Optional;
-
+import java.util.Optional
+        ;
 @Log4j2
 @Service
 @RequiredArgsConstructor
@@ -119,5 +124,24 @@ public class BoardServiceImpl implements BoardService{
 
             boardRepository.save(existingBoard);
         } else throw new IllegalArgumentException("memberId not match");
+    }
+
+    @Override
+    public BoardPageDTO readPage(int page, int size, String boardCategory, String sortBy) {
+
+        Pageable pageable = PageRequest.of(page-1, size, Sort.by(Sort.Direction.DESC, sortBy));
+
+        Page<Board> boardPage;
+        if (Objects.equals(boardCategory, "ALL")) {
+            boardPage = boardRepository.findByRootIdIsNull(pageable);
+        } else {
+            boardPage = boardRepository.findByRootIdIsNullAndBoardCategory(BoardCategory.valueOf(boardCategory), pageable);
+        }
+
+        BoardPageDTO boardPageDTO = new BoardPageDTO();
+        boardPageDTO.setTotalPages(boardPage.getTotalPages());
+        boardPageDTO.setBoardDTOList(boardPage.stream().map(this::entityToDto).toList());
+
+        return boardPageDTO;
     }
 }
