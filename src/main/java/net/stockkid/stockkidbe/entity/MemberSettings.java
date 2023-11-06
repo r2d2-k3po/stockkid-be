@@ -12,7 +12,7 @@ public class MemberSettings {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long memberId;
+    private Long id;
 
     @Column
     private @Setter String screenTitle1;
@@ -20,6 +20,7 @@ public class MemberSettings {
     @Lob
     @Column
     @ToString.Exclude
+    @Basic(fetch = FetchType.LAZY)
     private @Setter String screenSetting1;
 
     @Column
@@ -28,6 +29,7 @@ public class MemberSettings {
     @Lob
     @Column
     @ToString.Exclude
+    @Basic(fetch = FetchType.LAZY)
     private @Setter String screenSetting2;
 
     @Column
@@ -36,5 +38,6 @@ public class MemberSettings {
     @Lob
     @Column
     @ToString.Exclude
+    @Basic(fetch = FetchType.LAZY)
     private @Setter String screenSetting3;
 }

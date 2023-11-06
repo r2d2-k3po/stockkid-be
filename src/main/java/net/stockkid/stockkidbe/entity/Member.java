@@ -14,7 +14,7 @@ import org.hibernate.annotations.NaturalId;
 public class Member extends BaseEntity {
 
     @Id
-    private Long memberId;
+    private Long id;
 
     @NotNull
     @NaturalId
@@ -29,7 +29,7 @@ public class Member extends BaseEntity {
 
     @NotNull
     @Enumerated(EnumType.STRING)
-    private @Setter MemberSocial fromSocial;
+    private @Setter MemberSocial memberSocial;
 
     @Column(length = 1024)
     private @Setter String refreshToken;
