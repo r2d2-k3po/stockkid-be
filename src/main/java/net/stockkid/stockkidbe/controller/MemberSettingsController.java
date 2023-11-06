@@ -5,10 +5,12 @@ import lombok.extern.log4j.Log4j2;
 import net.stockkid.stockkidbe.dto.*;
 import net.stockkid.stockkidbe.dto.ResponseStatus;
 import net.stockkid.stockkidbe.service.MemberSettingsService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.nio.charset.StandardCharsets;
@@ -20,6 +22,9 @@ import java.nio.charset.StandardCharsets;
 public class MemberSettingsController {
 
     private final MemberSettingsService memberSettingsService;
+
+    @Value("${default.settings.memberId}")
+    private Long defaultSettingsMemberId;
 
     @PostMapping("/saveScreenComposition")
     public ResponseEntity<ResponseDTO> saveScreenComposition(@RequestBody ScreenCompositionDTO screenCompositionDTO) {
@@ -48,22 +53,9 @@ public class MemberSettingsController {
 
         log.info("--------------loadScreenSetting--------------");
 
-        ResponseDTO responseDTO = new ResponseDTO();
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
+        Long memberId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        try {
-            ScreenSettingDTO screenSettingDTO = memberSettingsService.loadScreenSetting(number);
-            responseDTO.setApiObj(screenSettingDTO);
-            responseDTO.setApiStatus(ResponseStatus.LOAD_OK);
-            responseDTO.setApiMsg("Load OK");
-            return new ResponseEntity<>(responseDTO, httpHeaders, HttpStatus.OK);
-        } catch (Exception e) {
-            log.info("Load Error : " + e.getMessage());
-            responseDTO.setApiStatus(ResponseStatus.LOAD_FAIL);
-            responseDTO.setApiMsg(e.getMessage());
-            return new ResponseEntity<>(responseDTO, httpHeaders, HttpStatus.CONFLICT);
-        }
+        return loadScreenSettingById(memberId, number);
     }
 
     @GetMapping("/loadScreenSettingDefault/{number}")
@@ -71,12 +63,17 @@ public class MemberSettingsController {
 
         log.info("--------------loadScreenSettingDefault--------------");
 
+        return loadScreenSettingById(defaultSettingsMemberId, number);
+    }
+
+    private ResponseEntity<ResponseDTO> loadScreenSettingById(Long id, String number) {
+
         ResponseDTO responseDTO = new ResponseDTO();
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
 
         try {
-            ScreenSettingDTO screenSettingDTO = memberSettingsService.loadScreenSettingDefault(number);
+            ScreenSettingDTO screenSettingDTO = memberSettingsService.loadScreenSettingById(id, number);
             responseDTO.setApiObj(screenSettingDTO);
             responseDTO.setApiStatus(ResponseStatus.LOAD_OK);
             responseDTO.setApiMsg("Load OK");
@@ -94,22 +91,9 @@ public class MemberSettingsController {
 
         log.info("--------------loadScreenTitles--------------");
 
-        ResponseDTO responseDTO = new ResponseDTO();
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
+        Long memberId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        try {
-            ScreenTitlesDTO screenTitlesDTO = memberSettingsService.loadScreenTitles();
-            responseDTO.setApiObj(screenTitlesDTO);
-            responseDTO.setApiStatus(ResponseStatus.LOAD_OK);
-            responseDTO.setApiMsg("Load OK");
-            return new ResponseEntity<>(responseDTO, httpHeaders, HttpStatus.OK);
-        } catch (Exception e) {
-            log.info("Load Error : " + e.getMessage());
-            responseDTO.setApiStatus(ResponseStatus.LOAD_FAIL);
-            responseDTO.setApiMsg(e.getMessage());
-            return new ResponseEntity<>(responseDTO, httpHeaders, HttpStatus.CONFLICT);
-        }
+        return loadScreenTitlesById(memberId);
     }
 
     @GetMapping("/loadScreenTitlesDefault")
@@ -117,12 +101,17 @@ public class MemberSettingsController {
 
         log.info("--------------loadScreenTitlesDefault--------------");
 
+        return loadScreenTitlesById(defaultSettingsMemberId);
+    }
+
+    private ResponseEntity<ResponseDTO> loadScreenTitlesById(Long id) {
+
         ResponseDTO responseDTO = new ResponseDTO();
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
 
         try {
-            ScreenTitlesDTO screenTitlesDTO = memberSettingsService.loadScreenTitlesDefault();
+            ScreenTitlesDTO screenTitlesDTO = memberSettingsService.loadScreenTitlesById(id);
             responseDTO.setApiObj(screenTitlesDTO);
             responseDTO.setApiStatus(ResponseStatus.LOAD_OK);
             responseDTO.setApiMsg("Load OK");

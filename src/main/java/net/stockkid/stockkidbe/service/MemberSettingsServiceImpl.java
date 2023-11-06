@@ -8,7 +8,6 @@ import net.stockkid.stockkidbe.dto.ScreenSettingDTO;
 import net.stockkid.stockkidbe.dto.ScreenTitlesDTO;
 import net.stockkid.stockkidbe.entity.MemberSettings;
 import net.stockkid.stockkidbe.repository.MemberSettingsRepository;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -23,9 +22,6 @@ import java.util.Optional;
 public class MemberSettingsServiceImpl implements MemberSettingsService {
 
     private final MemberSettingsRepository memberSettingsRepository;
-
-    @Value("${default.settings.memberId}")
-    private Long defaultSettingsMemberId;
 
     @Override
     public void saveScreenComposition(ScreenCompositionDTO dto) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
@@ -46,10 +42,9 @@ public class MemberSettingsServiceImpl implements MemberSettingsService {
     }
 
     @Override
-    public ScreenSettingDTO loadScreenSetting(String number) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    public ScreenSettingDTO loadScreenSettingById(Long id, String number) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
 
-        Long memberId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Optional<MemberSettings> optionalMemberSettings = memberSettingsRepository.findById(memberId);
+        Optional<MemberSettings> optionalMemberSettings = memberSettingsRepository.findById(id);
         MemberSettings existingMemberSettings = optionalMemberSettings.orElseThrow(() -> new IllegalArgumentException("memberId not found"));
 
         String getterNameScreenSetting = "getScreenSetting" + number;
@@ -63,40 +58,9 @@ public class MemberSettingsServiceImpl implements MemberSettingsService {
     }
 
     @Override
-    public ScreenSettingDTO loadScreenSettingDefault(String number) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    public ScreenTitlesDTO loadScreenTitlesById(Long id) {
 
-        Optional<MemberSettings> optionalMemberSettings = memberSettingsRepository.findById(defaultSettingsMemberId);
-        MemberSettings existingMemberSettings = optionalMemberSettings.orElseThrow(() -> new IllegalArgumentException("memberId not found"));
-
-        String getterNameScreenSetting = "getScreenSetting" + number;
-        Method getterMethodScreenSetting = MemberSettings.class.getMethod(getterNameScreenSetting);
-
-        ScreenSettingDTO screenSettingDTO = new ScreenSettingDTO();
-        String screenSetting = (String) getterMethodScreenSetting.invoke(existingMemberSettings);
-        screenSettingDTO.setScreenSetting(screenSetting);
-
-        return screenSettingDTO;
-    }
-
-    @Override
-    public ScreenTitlesDTO loadScreenTitles() {
-
-        Long memberId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Optional<MemberSettings> optionalMemberSettings = memberSettingsRepository.findById(memberId);
-        MemberSettings existingMemberSettings = optionalMemberSettings.orElseThrow(() -> new IllegalArgumentException("memberId not found"));
-
-        ScreenTitlesDTO screenTitlesDTO = new ScreenTitlesDTO();
-        screenTitlesDTO.setScreenTitle1(existingMemberSettings.getScreenTitle1());
-        screenTitlesDTO.setScreenTitle2(existingMemberSettings.getScreenTitle2());
-        screenTitlesDTO.setScreenTitle3(existingMemberSettings.getScreenTitle3());
-
-        return screenTitlesDTO;
-    }
-
-    @Override
-    public ScreenTitlesDTO loadScreenTitlesDefault() {
-
-        Optional<MemberSettings> optionalMemberSettings = memberSettingsRepository.findById(defaultSettingsMemberId);
+        Optional<MemberSettings> optionalMemberSettings = memberSettingsRepository.findById(id);
         MemberSettings existingMemberSettings = optionalMemberSettings.orElseThrow(() -> new IllegalArgumentException("memberId not found"));
 
         ScreenTitlesDTO screenTitlesDTO = new ScreenTitlesDTO();

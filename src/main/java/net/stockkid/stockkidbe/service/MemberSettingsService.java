@@ -10,11 +10,7 @@ public interface MemberSettingsService {
 
     void saveScreenComposition(ScreenCompositionDTO dto) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException;
 
-    ScreenSettingDTO loadScreenSetting(String number) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException;
+    ScreenSettingDTO loadScreenSettingById(Long id, String number) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException;
 
-    ScreenSettingDTO loadScreenSettingDefault(String number) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException;
-
-    ScreenTitlesDTO loadScreenTitles();
-
-    ScreenTitlesDTO loadScreenTitlesDefault();
+    ScreenTitlesDTO loadScreenTitlesById(Long id);
 }
