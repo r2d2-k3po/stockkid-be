@@ -34,7 +34,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         }
 
         Member member = result.get();
-        if (member.getFromSocial() != MemberSocial.UP) throw new UsernameNotFoundException("User not found");
+        if (member.getMemberSocial() != MemberSocial.UP) throw new UsernameNotFoundException("User not found");
 
         log.info("----------------------------------------------");
         log.info(member);

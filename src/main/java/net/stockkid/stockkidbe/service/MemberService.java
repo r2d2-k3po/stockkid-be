@@ -15,7 +15,7 @@ public interface MemberService {
 
     void disableUser(String password);
 
-    void disableSocialUser(Long memberId);
+    void disableSocialUser(Long id);
 
     void updateRefreshToken(String username, String refreshToken);
 
@@ -31,14 +31,14 @@ public interface MemberService {
                 .accountNonLocked(dto.isAccountNonLocked())
                 .credentialsNonExpired(dto.isCredentialsNonExpired())
                 .enabled(dto.isEnabled())
-                .fromSocial(dto.getFromSocial())
+                .memberSocial(dto.getMemberSocial())
                 .refreshToken(dto.getRefreshToken())
                 .build();
     }
 
     default MemberDTO entityToDto(Member entity) {
         return MemberDTO.builder()
-                .memberId(entity.getMemberId())
+                .id(entity.getId())
                 .username(entity.getUsername())
                 .password(entity.getPassword())
                 .memberRole(entity.getMemberRole())
@@ -46,7 +46,7 @@ public interface MemberService {
                 .accountNonLocked(entity.isAccountNonLocked())
                 .credentialsNonExpired(entity.isCredentialsNonExpired())
                 .enabled(entity.isEnabled())
-                .fromSocial(entity.getFromSocial())
+                .memberSocial(entity.getMemberSocial())
                 .refreshToken(entity.getRefreshToken())
                 .regDate(entity.getRegDate())
                 .modDate(entity.getModDate())

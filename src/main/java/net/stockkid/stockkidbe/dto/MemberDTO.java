@@ -14,13 +14,13 @@ import java.time.LocalDateTime;
 @Data
 public class MemberDTO extends AuthDTO {
 
-    private Long memberId;
+    private Long id;
     private MemberRole memberRole = MemberRole.USER;
     private boolean accountNonExpired = true;
     private boolean accountNonLocked = true;
     private boolean credentialsNonExpired = true;
     private boolean enabled = true;
-    private MemberSocial fromSocial = MemberSocial.UP;
+    private MemberSocial memberSocial = MemberSocial.UP;
     private String refreshToken;
     private LocalDateTime regDate, modDate;
 }

@@ -44,11 +44,11 @@ public class MemberServiceImpl implements MemberService {
     public void updateUser(MemberDTO dto) {
 
         Member existingUser;
-        if (dto.getMemberId() == null) {
+        if (dto.getId() == null) {
             Optional<Member> optionalUser = memberRepository.findByUsername(dto.getUsername());
             existingUser = optionalUser.orElseThrow(() -> new UsernameNotFoundException("User not found"));
         } else {
-            Optional<Member> optionalUser = memberRepository.findById(dto.getMemberId());
+            Optional<Member> optionalUser = memberRepository.findById(dto.getId());
             existingUser = optionalUser.orElseThrow(() -> new IllegalArgumentException("memberId not found"));
         }
 
@@ -58,7 +58,7 @@ public class MemberServiceImpl implements MemberService {
         existingUser.setAccountNonLocked(dto.isAccountNonLocked());
         existingUser.setCredentialsNonExpired(dto.isCredentialsNonExpired());
         existingUser.setEnabled(dto.isEnabled());
-        existingUser.setFromSocial(dto.getFromSocial());
+        existingUser.setMemberSocial(dto.getMemberSocial());
         existingUser.setRefreshToken(dto.getRefreshToken());
 
         memberRepository.save(existingUser);
@@ -79,8 +79,8 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public void changePassword(String oldPassword, String newPassword) {
 
-        Long memberId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Optional<Member> optionalUser = memberRepository.findById(memberId);
+        Long id = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Optional<Member> optionalUser = memberRepository.findById(id);
         Member existingUser = optionalUser.orElseThrow(() -> new IllegalArgumentException("memberId not found"));
 
         if (passwordEncoder.matches(oldPassword, existingUser.getPassword())) {
@@ -95,8 +95,8 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public void disableUser(String password) {
 
-        Long memberId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Optional<Member> optionalUser = memberRepository.findById(memberId);
+        Long id = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Optional<Member> optionalUser = memberRepository.findById(id);
         Member existingUser = optionalUser.orElseThrow(() -> new IllegalArgumentException("memberId not found"));
 
         if (passwordEncoder.matches(password, existingUser.getPassword())) {
@@ -108,8 +108,8 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public void disableSocialUser(Long memberId) {
-        Optional<Member> optionalUser = memberRepository.findById(memberId);
+    public void disableSocialUser(Long id) {
+        Optional<Member> optionalUser = memberRepository.findById(id);
         Member existingUser = optionalUser.orElseThrow(() -> new IllegalArgumentException("memberId not found"));
 
         existingUser.setEnabled(false);
