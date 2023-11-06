@@ -62,7 +62,7 @@ public class ApiKakaoFilter extends OncePerRequestFilter {
                     MemberDTO newMemberDTO = new MemberDTO();
                     newMemberDTO.setUsername(email);
                     newMemberDTO.setPassword(tokenUtil.generateRandomPassword(30));
-                    newMemberDTO.setFromSocial(MemberSocial.KKO);
+                    newMemberDTO.setMemberSocial(MemberSocial.KKO);
 
                     log.info("create new Kakao user");
                     memberService.createUser(newMemberDTO);
@@ -75,7 +75,7 @@ public class ApiKakaoFilter extends OncePerRequestFilter {
 
                     ioUtil.writeResponseBody(response, responseDTO);
                     return;
-                } else if (memberDTO.getFromSocial() == MemberSocial.KKO) {
+                } else if (memberDTO.getMemberSocial() == MemberSocial.KKO) {
                     if (!memberDTO.isEnabled()) throw new Exception("User disabled");
                     if (!memberDTO.isAccountNonExpired()) throw new Exception("Account expired");
                     if (!memberDTO.isCredentialsNonExpired()) throw new Exception("Credential expired");
@@ -83,7 +83,7 @@ public class ApiKakaoFilter extends OncePerRequestFilter {
 
                     if (new AntPathRequestMatcher("/api/kakao/member/signin").matches(request)) {
                         log.info("create tokens for existing user");
-                        TokensDTO tokensDTO = tokenUtil.generateTokens(memberDTO.getMemberId(), email, memberDTO.getMemberRole().name(), MemberSocial.KKO.name());
+                        TokensDTO tokensDTO = tokenUtil.generateTokens(memberDTO.getId(), email, memberDTO.getMemberRole().name(), MemberSocial.KKO.name());
 
                         response.setStatus(HttpServletResponse.SC_OK);
                         ResponseDTO responseDTO = new ResponseDTO(ResponseStatus.LOGIN_OK, "Login OK", tokensDTO);
@@ -92,7 +92,7 @@ public class ApiKakaoFilter extends OncePerRequestFilter {
                     } else if (new AntPathRequestMatcher("/api/kakao/member/deleteAccount").matches(request)) {
                         log.info("disable existing Kakao user");
                         memberDTO.setEnabled(false);
-                        memberService.disableSocialUser(memberDTO.getMemberId());
+                        memberService.disableSocialUser(memberDTO.getId());
 
                         response.setStatus(HttpServletResponse.SC_OK);
 

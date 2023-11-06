@@ -26,7 +26,7 @@ public class MemberServiceTests {
                     .accountNonLocked(true)
                     .credentialsNonExpired(true)
                     .enabled(true)
-                    .fromSocial(MemberSocial.UP)
+                    .memberSocial(MemberSocial.UP)
                     .build();
             memberService.createUser(memberDTO);
         });
@@ -36,10 +36,10 @@ public class MemberServiceTests {
     public void loadUserTest() {
         MemberDTO memberDTO = memberService.loadUserByUsername("DefaultSettings@stockkid.net");
 
-        System.out.println(memberDTO.getMemberId());
+        System.out.println(memberDTO.getId());
         System.out.println(memberDTO.getPassword());
         System.out.println(memberDTO.getMemberRole());
-        System.out.println(memberDTO.getFromSocial());
+        System.out.println(memberDTO.getMemberSocial());
         System.out.println(memberDTO.getModDate());
     }
 

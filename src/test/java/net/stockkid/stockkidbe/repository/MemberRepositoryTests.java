@@ -38,7 +38,7 @@ public class MemberRepositoryTests {
                     .accountNonLocked(true)
                     .credentialsNonExpired(true)
                     .enabled(true)
-                    .fromSocial(MemberSocial.UP)
+                    .memberSocial(MemberSocial.UP)
                     .build();
             memberRepository.save(member);
         });

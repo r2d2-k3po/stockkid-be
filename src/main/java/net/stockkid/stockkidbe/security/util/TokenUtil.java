@@ -24,7 +24,7 @@ public class TokenUtil {
         TokensDTO tokensDTO = new TokensDTO();
 
         if (sid == null) {
-            sid = memberService.loadUserByUsername(sub).getMemberId();
+            sid = memberService.loadUserByUsername(sub).getId();
         }
         tokensDTO.setAccessToken(jwtUtil.generateAccessToken(sid, rol));
         tokensDTO.setRefreshToken(jwtUtil.generateRefreshToken(sub, rol, soc));
@@ -42,7 +42,7 @@ public class TokenUtil {
         MemberDTO memberDTO = memberService.loadUserByUsername(sub);
 
         if (Objects.equals(refreshToken, memberDTO.getRefreshToken())) {
-            return generateTokens(memberDTO.getMemberId(), sub, rol, soc);
+            return generateTokens(memberDTO.getId(), sub, rol, soc);
         } else {
             throw new Exception("refreshToken not valid");
         }
