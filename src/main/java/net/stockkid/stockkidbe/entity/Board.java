@@ -21,7 +21,7 @@ public class Board extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long boardId;
+    private Long id;
 
     @NotNull
     private @Setter Long memberId;
@@ -45,6 +45,7 @@ public class Board extends BaseEntity {
     @Lob
     @NotNull
     @ToString.Exclude
+    @Basic(fetch = FetchType.LAZY)
     private @Setter String content;
 
     @Column

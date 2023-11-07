@@ -14,6 +14,7 @@ import org.hibernate.annotations.NaturalId;
 public class Member extends BaseEntity {
 
     @Id
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotNull

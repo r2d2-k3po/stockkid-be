@@ -20,28 +20,9 @@ public interface BoardService {
 
     BoardPageDTO readPage(int page, int size, String boardCategory, String sortBy);
 
-    default Board dtoToEntity(BoardDTO dto) {
-        return Board.builder()
-                .boardId(dto.getBoardId())
-                .memberId(dto.getMemberId())
-                .rootId(dto.getRootId())
-                .parentId(dto.getParentId())
-                .boardCategory(dto.getBoardCategory())
-                .nickname(dto.getNickname())
-                .title(dto.getTitle())
-                .content(dto.getContent())
-                .tag1(dto.getTag1())
-                .tag2(dto.getTag2())
-                .tag3(dto.getTag3())
-                .readCount(dto.getReadCount())
-                .replyCount(dto.getReplyCount())
-                .likeCount(dto.getLikeCount())
-                .build();
-    }
-
     default BoardDTO entityToDto(Board entity) {
         return BoardDTO.builder()
-                .boardId(entity.getBoardId())
+                .boardId(entity.getId())
                 .memberId(entity.getMemberId())
                 .rootId(entity.getRootId())
                 .parentId(entity.getParentId())
