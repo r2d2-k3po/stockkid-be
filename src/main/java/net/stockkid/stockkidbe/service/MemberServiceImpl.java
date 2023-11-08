@@ -34,7 +34,10 @@ public class MemberServiceImpl implements MemberService {
             Member member = dtoToEntity(dto);
             member.setPassword(passwordEncoder.encode(dto.getPassword()));
 
-            member.setMemberSettings(new MemberSettings());
+            MemberSettings memberSettings = new MemberSettings();
+            memberSettings.setMember(member);
+
+            member.setMemberSettings(memberSettings);
             memberRepository.save(member);
         }
     }

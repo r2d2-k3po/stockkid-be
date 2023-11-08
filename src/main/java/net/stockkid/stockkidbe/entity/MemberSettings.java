@@ -3,6 +3,8 @@ package net.stockkid.stockkidbe.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import static org.hibernate.Length.LONG32;
+
 @Entity
 @ToString
 @Getter
@@ -11,33 +13,35 @@ import lombok.*;
 public class MemberSettings {
 
     @Id
-//    @GeneratedValue()
-    private String id;
+    private Long memberId;
 
     @Column
     private @Setter String screenTitle1;
 
-    @Lob
-    @Column
+    @Column(length = LONG32)
     @ToString.Exclude
-//    @Basic(fetch = FetchType.LAZY)
+    @Basic(fetch = FetchType.LAZY)
     private @Setter String screenSetting1;
 
     @Column
     private @Setter String screenTitle2;
 
-    @Lob
-    @Column
+    @Column(length = LONG32)
     @ToString.Exclude
-//    @Basic(fetch = FetchType.LAZY)
+    @Basic(fetch = FetchType.LAZY)
     private @Setter String screenSetting2;
 
     @Column
     private @Setter String screenTitle3;
 
-    @Lob
-    @Column
+    @Column(length = LONG32)
     @ToString.Exclude
-//    @Basic(fetch = FetchType.LAZY)
+    @Basic(fetch = FetchType.LAZY)
     private @Setter String screenSetting3;
+
+    @OneToOne(cascade = CascadeType.ALL, optional = false, fetch = FetchType.LAZY)
+    @MapsId
+    @JoinColumn(name = "member_id")
+    @ToString.Exclude
+    private @Setter Member member;
 }
