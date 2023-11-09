@@ -39,7 +39,7 @@ public class MemberSettings {
     @Basic(fetch = FetchType.LAZY)
     private @Setter String screenSetting3;
 
-    @OneToOne(cascade = CascadeType.ALL, optional = false, fetch = FetchType.LAZY)
+    @OneToOne(optional = false, fetch = FetchType.LAZY)
     @MapsId
     @JoinColumn(name = "member_id")
     @ToString.Exclude

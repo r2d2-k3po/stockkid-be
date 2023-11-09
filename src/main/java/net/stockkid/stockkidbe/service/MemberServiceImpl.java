@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.stockkid.stockkidbe.dto.MemberDTO;
 import net.stockkid.stockkidbe.entity.Member;
+import net.stockkid.stockkidbe.entity.MemberInfo;
 import net.stockkid.stockkidbe.entity.MemberSettings;
 import net.stockkid.stockkidbe.repository.MemberRepository;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -37,7 +38,11 @@ public class MemberServiceImpl implements MemberService {
             MemberSettings memberSettings = new MemberSettings();
             memberSettings.setMember(member);
 
+            MemberInfo memberInfo = new MemberInfo();
+            memberInfo.setMember(member);
+
             member.setMemberSettings(memberSettings);
+            member.setMemberInfo(memberInfo);
             memberRepository.save(member);
         }
     }

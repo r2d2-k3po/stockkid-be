@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import static org.hibernate.Length.LONG32;
+
 @Entity
 @ToString
 @Getter
@@ -21,6 +23,7 @@ public class Board extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "board_id")
     private Long id;
 
     @NotNull
@@ -42,7 +45,7 @@ public class Board extends BaseEntity {
     @Column
     private @Setter String title;
 
-    @Lob
+    @Column(length = LONG32)
     @NotNull
     @ToString.Exclude
     @Basic(fetch = FetchType.LAZY)

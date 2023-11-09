@@ -48,7 +48,11 @@ public class Member extends BaseEntity {
     @NotNull
     private @Setter boolean enabled;
 
-    @OneToOne(cascade = CascadeType.ALL, optional = false, fetch = FetchType.LAZY, mappedBy = "member")
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, optional = false, fetch = FetchType.LAZY, mappedBy = "member")
     @ToString.Exclude
     private @Setter MemberSettings memberSettings;
+
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, optional = false, fetch = FetchType.LAZY, mappedBy = "member")
+    @ToString.Exclude
+    private @Setter MemberInfo memberInfo;
 }
