@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.hibernate.Length.LONG32;
 
 @Entity
@@ -13,8 +16,6 @@ import static org.hibernate.Length.LONG32;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(indexes = {
-        @Index(columnList = "memberId"),
-        @Index(columnList = "rootId"),
         @Index(columnList = "tag1"),
         @Index(columnList = "tag2"),
         @Index(columnList = "tag3")
@@ -26,15 +27,6 @@ public class Board extends BaseEntity {
     @Column(name = "board_id")
     private Long id;
 
-    @NotNull
-    private @Setter Long memberId;
-
-    @Column
-    private @Setter Long rootId;
-
-    @Column
-    private @Setter Long parentId;
-
     @Column
     @Enumerated(EnumType.STRING)
     private @Setter BoardCategory boardCategory;
@@ -44,6 +36,10 @@ public class Board extends BaseEntity {
 
     @Column
     private @Setter String title;
+
+    @NotNull
+    @ToString.Exclude
+    private @Setter String preview;
 
     @Column(length = LONG32)
     @NotNull
@@ -60,12 +56,22 @@ public class Board extends BaseEntity {
     @Column
     private @Setter String tag3;
 
-    @Column
-    private @Setter int readCount;
-
-    @Column
-    private @Setter int replyCount;
+    @NotNull
+    private @Setter Long readCount = 0L;
 
     @NotNull
-    private @Setter int likeCount;
+    private @Setter Long replyCount = 0L;
+
+    @NotNull
+    private @Setter Long likeCount = 0L;
+
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    @ToString.Exclude
+    private @Setter MemberInfo memberInfo;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "board")
+    @OrderBy("id asc")
+    @ToString.Exclude
+    private @Setter List<Reply> replyList = new ArrayList<>();
 }
