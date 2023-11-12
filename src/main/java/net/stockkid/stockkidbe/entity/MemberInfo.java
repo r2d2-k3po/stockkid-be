@@ -29,12 +29,12 @@ public class MemberInfo {
     @ToString.Exclude
     private @Setter Member member;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "memberInfo")
+    @OneToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY, mappedBy = "memberInfo", orphanRemoval = true)
     @OrderBy("id desc")
     @ToString.Exclude
     private @Setter List<Board> boardList = new ArrayList<>();
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "memberInfo")
+    @OneToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY, mappedBy = "memberInfo", orphanRemoval = true)
     @OrderBy("id desc")
     @ToString.Exclude
     private @Setter List<Reply> replyList = new ArrayList<>();

@@ -2,19 +2,14 @@ package net.stockkid.stockkidbe.service;
 
 import net.stockkid.stockkidbe.dto.BoardDTO;
 import net.stockkid.stockkidbe.dto.BoardPageDTO;
-import net.stockkid.stockkidbe.dto.PostDTO;
-import net.stockkid.stockkidbe.dto.ReplyDTO;
+import net.stockkid.stockkidbe.dto.PostBoardDTO;
 import net.stockkid.stockkidbe.entity.Board;
 
 public interface BoardService {
 
-    void registerPost(PostDTO dto);
+    void register(PostBoardDTO dto);
 
-    void modifyPost(PostDTO dto);
-
-    void registerReply(ReplyDTO dto);
-
-    void modifyReply(ReplyDTO dto);
+    void modify(PostBoardDTO dto);
 
     void delete(Long boardId);
 
@@ -24,8 +19,6 @@ public interface BoardService {
         return BoardDTO.builder()
                 .boardId(entity.getId())
                 .memberId(entity.getMemberId())
-                .rootId(entity.getRootId())
-                .parentId(entity.getParentId())
                 .boardCategory(entity.getBoardCategory())
                 .nickname(entity.getNickname())
                 .title(entity.getTitle())

@@ -4,11 +4,12 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.stockkid.stockkidbe.dto.BoardPageDTO;
-import net.stockkid.stockkidbe.dto.PostDTO;
-import net.stockkid.stockkidbe.dto.ReplyDTO;
+import net.stockkid.stockkidbe.dto.PostBoardDTO;
 import net.stockkid.stockkidbe.entity.Board;
 import net.stockkid.stockkidbe.entity.BoardCategory;
+import net.stockkid.stockkidbe.entity.MemberInfo;
 import net.stockkid.stockkidbe.repository.BoardRepository;
+import net.stockkid.stockkidbe.repository.MemberInfoRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -26,85 +27,50 @@ import java.util.Optional
 public class BoardServiceImpl implements BoardService{
 
     private final BoardRepository boardRepository;
+    private final MemberInfoRepository memberInfoRepository;
 
     // USER
     @Override
-    public void registerPost(PostDTO dto) {
+    public void register(PostBoardDTO dto) {
 
         Long memberId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Board board = Board.builder()
-                .memberId(memberId)
-                .boardCategory(BoardCategory.valueOf(dto.getBoardCategory()))
-                .nickname(dto.getNickname())
-                .title(dto.getTitle())
-                .content(dto.getContent())
-                .tag1(dto.getTag1())
-                .tag2(dto.getTag2())
-                .tag3(dto.getTag3())
-                .readCount(0)
-                .replyCount(0)
-                .likeCount(0)
-                .build();
+        MemberInfo memberInfo = memberInfoRepository.getReferenceById(memberId);
+
+        Board board = new Board();
+        board.setBoardCategory(BoardCategory.valueOf(dto.getBoardCategory()));
+        board.setNickname(dto.getNickname());
+        board.setTitle(dto.getTitle());
+        board.setPreview(dto.getPreview());
+        board.setContent(dto.getContent());
+        board.setTag1(dto.getTag1());
+        board.setTag2(dto.getTag2());
+        board.setTag3(dto.getTag3());
+        board.setMemberInfo(memberInfo);
+
+        memberInfo.getBoardList().add(board);
 
         boardRepository.save(board);
     }
 
     @Override
-    public void modifyPost(PostDTO dto) {
+    public void modify(PostBoardDTO dto) {
 
         Long memberId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        Optional<Board> optionalPost = boardRepository.findById(dto.getBoardId());
-        Board existingPost = optionalPost.orElseThrow(() -> new IllegalArgumentException("boardId not found"));
+        Optional<Board> optionalBoard = boardRepository.findById(dto.getBoardId());
+        Board existingBoard = optionalBoard.orElseThrow(() -> new IllegalArgumentException("boardId not found"));
 
-        if (Objects.equals(existingPost.getMemberId(), memberId)) {
-            existingPost.setBoardCategory(BoardCategory.valueOf(dto.getBoardCategory()));
-            existingPost.setNickname(dto.getNickname());
-            existingPost.setTitle(dto.getTitle());
-            existingPost.setContent(dto.getContent());
-            existingPost.setTag1(dto.getTag1());
-            existingPost.setTag2(dto.getTag2());
-            existingPost.setTag3(dto.getTag3());
+        if (Objects.equals(existingBoard.getMemberInfo().getMemberId(), memberId)) {
+            existingBoard.setBoardCategory(BoardCategory.valueOf(dto.getBoardCategory()));
+            existingBoard.setNickname(dto.getNickname());
+            existingBoard.setTitle(dto.getTitle());
+            existingBoard.setPreview(dto.getPreview());
+            existingBoard.setContent(dto.getContent());
+            existingBoard.setTag1(dto.getTag1());
+            existingBoard.setTag2(dto.getTag2());
+            existingBoard.setTag3(dto.getTag3());
 
-            boardRepository.save(existingPost);
-        } else throw new IllegalArgumentException("memberId not match");
-    }
-
-    @Override
-    public void registerReply(ReplyDTO dto) {
-
-        Optional<Board> optionalPost = boardRepository.findById(dto.getRootId());
-        Board existingPost = optionalPost.orElseThrow(() -> new IllegalArgumentException("boardId not found"));
-
-        Long memberId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Board reply = Board.builder()
-                .memberId(memberId)
-                .rootId(dto.getRootId())
-                .parentId(dto.getParentId())
-                .nickname(dto.getNickname())
-                .content(dto.getContent())
-                .likeCount(0)
-                .build();
-
-        boardRepository.save(reply);
-
-        existingPost.setReplyCount(existingPost.getReplyCount() + 1);
-        boardRepository.save(existingPost);
-    }
-
-    @Override
-    public void modifyReply(ReplyDTO dto) {
-
-        Long memberId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        Optional<Board> optionalReply = boardRepository.findById(dto.getBoardId());
-        Board existingReply = optionalReply.orElseThrow(() -> new IllegalArgumentException("boardId not found"));
-
-        if (Objects.equals(existingReply.getMemberId(), memberId)) {
-            existingReply.setNickname(dto.getNickname());
-            existingReply.setContent(dto.getContent());
-
-            boardRepository.save(existingReply);
+            boardRepository.save(existingBoard);
         } else throw new IllegalArgumentException("memberId not match");
     }
 
@@ -116,10 +82,9 @@ public class BoardServiceImpl implements BoardService{
         Optional<Board> optionalBoard = boardRepository.findById(boardId);
         Board existingBoard = optionalBoard.orElseThrow(() -> new IllegalArgumentException("boardId not found"));
 
-        if (Objects.equals(existingBoard.getMemberId(), memberId)) {
-            if (existingBoard.getRootId() == null) {
-                existingBoard.setTitle("deleted");
-            }
+        if (Objects.equals(existingBoard.getMemberInfo().getMemberId(), memberId)) {
+            existingBoard.setTitle("deleted");
+            existingBoard.setPreview("deleted");
             existingBoard.setContent("deleted");
 
             boardRepository.save(existingBoard);

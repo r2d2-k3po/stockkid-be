@@ -2,9 +2,10 @@ package net.stockkid.stockkidbe.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import net.stockkid.stockkidbe.dto.*;
+import net.stockkid.stockkidbe.dto.PostReplyDTO;
+import net.stockkid.stockkidbe.dto.ResponseDTO;
 import net.stockkid.stockkidbe.dto.ResponseStatus;
-import net.stockkid.stockkidbe.service.BoardService;
+import net.stockkid.stockkidbe.service.ReplyService;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -15,23 +16,23 @@ import java.nio.charset.StandardCharsets;
 
 @RestController
 @Log4j2
-@RequestMapping("/api/access/board")
+@RequestMapping("/api/access/reply")
 @RequiredArgsConstructor
-public class BoardController {
+public class ReplyController {
 
-    private final BoardService boardService;
+    private final ReplyService replyService;
 
     @PostMapping("/register")
-    public ResponseEntity<ResponseDTO> register(@RequestBody PostBoardDTO postBoardDTO) {
+    public ResponseEntity<ResponseDTO> register(@RequestBody PostReplyDTO postReplyDTO) {
 
-        log.info("--------------board register--------------");
+        log.info("--------------reply register--------------");
 
         ResponseDTO responseDTO = new ResponseDTO();
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
 
         try {
-            boardService.register(postBoardDTO);
+            replyService.register(postReplyDTO);
             responseDTO.setApiStatus(ResponseStatus.WRITE_OK);
             responseDTO.setApiMsg("Write OK");
             return new ResponseEntity<>(responseDTO, httpHeaders, HttpStatus.OK);
@@ -44,16 +45,16 @@ public class BoardController {
     }
 
     @PutMapping("/modify")
-    public ResponseEntity<ResponseDTO> modify(@RequestBody PostBoardDTO postBoardDTO) {
+    public ResponseEntity<ResponseDTO> modify(@RequestBody PostReplyDTO postReplyDTO) {
 
-        log.info("--------------board modify--------------");
+        log.info("--------------reply modify--------------");
 
         ResponseDTO responseDTO = new ResponseDTO();
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
 
         try {
-            boardService.modify(postBoardDTO);
+            replyService.modify(postReplyDTO);
             responseDTO.setApiStatus(ResponseStatus.WRITE_OK);
             responseDTO.setApiMsg("Write OK");
             return new ResponseEntity<>(responseDTO, httpHeaders, HttpStatus.OK);
@@ -65,17 +66,17 @@ public class BoardController {
         }
     }
 
-    @PatchMapping("/delete/{boardId}")
-    public ResponseEntity<ResponseDTO> delete(@PathVariable("boardId") Long boardId) {
+    @PatchMapping("/delete/{replyId}")
+    public ResponseEntity<ResponseDTO> delete(@PathVariable("replyId") Long replyId) {
 
-        log.info("--------------delete boardId--------------");
+        log.info("--------------delete replyId--------------");
 
         ResponseDTO responseDTO = new ResponseDTO();
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
 
         try {
-            boardService.delete(boardId);
+            replyService.delete(replyId);
             responseDTO.setApiStatus(ResponseStatus.WRITE_OK);
             responseDTO.setApiMsg("Write OK");
             return new ResponseEntity<>(responseDTO, httpHeaders, HttpStatus.OK);
@@ -86,28 +87,4 @@ public class BoardController {
             return new ResponseEntity<>(responseDTO, httpHeaders, HttpStatus.CONFLICT);
         }
     }
-
-    @GetMapping("/readPage")
-    public ResponseEntity<ResponseDTO> readPage(@RequestParam(value = "page", defaultValue = "1") int page, @RequestParam(value = "size", defaultValue = "20") int size, @RequestParam(value = "boardCategory", defaultValue = "ALL") String boardCategory, @RequestParam(value = "sortBy", defaultValue = "boardId") String sortBy) {
-
-        log.info("--------------readPage--------------");
-
-        ResponseDTO responseDTO = new ResponseDTO();
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
-
-        try {
-            BoardPageDTO boardPageDTO = boardService.readPage(page, size, boardCategory, sortBy);
-            responseDTO.setApiStatus(ResponseStatus.READ_OK);
-            responseDTO.setApiMsg("Read OK");
-            responseDTO.setApiObj(boardPageDTO);
-            return new ResponseEntity<>(responseDTO, httpHeaders, HttpStatus.OK);
-        } catch (Exception e) {
-            log.info("Read Error : " + e.getMessage());
-            responseDTO.setApiStatus(ResponseStatus.READ_FAIL);
-            responseDTO.setApiMsg(e.getMessage());
-            return new ResponseEntity<>(responseDTO, httpHeaders, HttpStatus.CONFLICT);
-        }
-    }
-
 }

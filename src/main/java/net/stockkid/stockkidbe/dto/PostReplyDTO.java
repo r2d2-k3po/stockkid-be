@@ -7,12 +7,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class PostDTO {
+public class PostReplyDTO {
 
+    private Long replyId;
     private Long boardId;
-    private String boardCategory;
+    private Long parentId;
     private String nickname;
-    private String title;
     private String content;
-    private String tag1, tag2, tag3;
 }
