@@ -18,10 +18,10 @@ public class MemberInfo {
     private Long memberId;
 
     @NotNull
-    private @Setter Long likeCount = 0L;
+    private @Setter int likeCount = 0;
 
     @NotNull
-    private @Setter Long credit = 0L;
+    private @Setter int credit = 0;
 
     @OneToOne(optional = false, fetch = FetchType.LAZY)
     @MapsId
@@ -38,4 +38,12 @@ public class MemberInfo {
     @OrderBy("id desc")
     @ToString.Exclude
     private @Setter List<Reply> replyList = new ArrayList<>();
+
+    public void addLikeCount(int number) {
+        likeCount += number;
+    }
+
+    public void addCredit(int number) {
+        credit += number;
+    }
 }

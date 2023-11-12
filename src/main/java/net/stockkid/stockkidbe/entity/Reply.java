@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
-import static org.hibernate.Length.LONG32;
+import static org.hibernate.Length.LONG;
 
 @Entity
 @ToString
@@ -25,13 +25,13 @@ public class Reply extends BaseEntity{
     @NotNull
     private @Setter String nickname;
 
-    @Column(length = LONG32)
+    @Column(length = LONG)
     @NotNull
     @ToString.Exclude
     private @Setter String content;
 
     @NotNull
-    private @Setter Long likeCount = 0L;
+    private @Setter int likeCount = 0;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
@@ -42,4 +42,8 @@ public class Reply extends BaseEntity{
     @JoinColumn(name = "board_id")
     @ToString.Exclude
     private @Setter Board board;
+
+    public void addLikeCount(int number) {
+        likeCount += number;
+    }
 }

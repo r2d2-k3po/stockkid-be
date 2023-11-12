@@ -7,7 +7,7 @@ import lombok.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.hibernate.Length.LONG32;
+import static org.hibernate.Length.LONG;
 
 @Entity
 @ToString
@@ -41,7 +41,7 @@ public class Board extends BaseEntity {
     @ToString.Exclude
     private @Setter String preview;
 
-    @Column(length = LONG32)
+    @Column(length = LONG)
     @NotNull
     @ToString.Exclude
     @Basic(fetch = FetchType.LAZY)
@@ -57,13 +57,13 @@ public class Board extends BaseEntity {
     private @Setter String tag3;
 
     @NotNull
-    private @Setter Long readCount = 0L;
+    private @Setter int readCount = 0;
 
     @NotNull
-    private @Setter Long replyCount = 0L;
+    private @Setter int replyCount = 0;
 
     @NotNull
-    private @Setter Long likeCount = 0L;
+    private @Setter int likeCount = 0;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
@@ -74,4 +74,16 @@ public class Board extends BaseEntity {
     @OrderBy("id asc")
     @ToString.Exclude
     private @Setter List<Reply> replyList = new ArrayList<>();
+
+    public void addReadCount() {
+        readCount += 1;
+    }
+
+    public void addReplyCount() {
+        replyCount += 1;
+    }
+
+    public void addLikeCount(int number) {
+        likeCount += number;
+    }
 }

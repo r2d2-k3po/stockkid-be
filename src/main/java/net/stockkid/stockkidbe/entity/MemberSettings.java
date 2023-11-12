@@ -3,7 +3,7 @@ package net.stockkid.stockkidbe.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import static org.hibernate.Length.LONG32;
+import static org.hibernate.Length.LONG;
 
 @Entity
 @ToString
@@ -18,7 +18,7 @@ public class MemberSettings {
     @Column
     private @Setter String screenTitle1;
 
-    @Column(length = LONG32)
+    @Column(length = LONG)
     @ToString.Exclude
     @Basic(fetch = FetchType.LAZY)
     private @Setter String screenSetting1;
@@ -26,7 +26,7 @@ public class MemberSettings {
     @Column
     private @Setter String screenTitle2;
 
-    @Column(length = LONG32)
+    @Column(length = LONG)
     @ToString.Exclude
     @Basic(fetch = FetchType.LAZY)
     private @Setter String screenSetting2;
@@ -34,7 +34,7 @@ public class MemberSettings {
     @Column
     private @Setter String screenTitle3;
 
-    @Column(length = LONG32)
+    @Column(length = LONG)
     @ToString.Exclude
     @Basic(fetch = FetchType.LAZY)
     private @Setter String screenSetting3;
