@@ -10,7 +10,6 @@ import java.util.List;
 @Entity
 @ToString
 @Getter
-@AllArgsConstructor
 @NoArgsConstructor
 public class MemberInfo {
 
@@ -29,12 +28,12 @@ public class MemberInfo {
     @ToString.Exclude
     private @Setter Member member;
 
-    @OneToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY, mappedBy = "memberInfo", orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY, mappedBy = "memberInfo")
     @OrderBy("id desc")
     @ToString.Exclude
     private @Setter List<Board> boardList = new ArrayList<>();
 
-    @OneToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY, mappedBy = "memberInfo", orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.REMOVE, fetch = FetchType.LAZY, mappedBy = "memberInfo")
     @OrderBy("id desc")
     @ToString.Exclude
     private @Setter List<Reply> replyList = new ArrayList<>();

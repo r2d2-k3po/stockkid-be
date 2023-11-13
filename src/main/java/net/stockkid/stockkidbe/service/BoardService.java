@@ -18,11 +18,11 @@ public interface BoardService {
     default BoardDTO entityToDto(Board entity) {
         return BoardDTO.builder()
                 .boardId(entity.getId())
-                .memberId(entity.getMemberId())
+                .memberId(entity.getMemberInfo().getMemberId())
                 .boardCategory(entity.getBoardCategory())
                 .nickname(entity.getNickname())
                 .title(entity.getTitle())
-                .content(entity.getContent())
+                .preview(entity.getPreview())
                 .tag1(entity.getTag1())
                 .tag2(entity.getTag2())
                 .tag3(entity.getTag3())
@@ -33,5 +33,4 @@ public interface BoardService {
                 .modDate(entity.getModDate())
                 .build();
     }
-
 }

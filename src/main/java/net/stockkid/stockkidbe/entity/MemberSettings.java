@@ -8,7 +8,6 @@ import static org.hibernate.Length.LONG;
 @Entity
 @ToString
 @Getter
-@AllArgsConstructor
 @NoArgsConstructor
 public class MemberSettings {
 

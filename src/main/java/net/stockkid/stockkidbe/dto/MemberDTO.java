@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder
-@AllArgsConstructor
 @NoArgsConstructor
 @Data
 public class MemberDTO extends AuthDTO {

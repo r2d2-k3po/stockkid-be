@@ -9,8 +9,6 @@ import static org.hibernate.Length.LONG;
 @Entity
 @ToString
 @Getter
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
 public class Reply extends BaseEntity{
 

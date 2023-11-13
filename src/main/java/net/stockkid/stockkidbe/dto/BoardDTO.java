@@ -13,11 +13,10 @@ public class BoardDTO {
 
     private Long boardId;
     private Long memberId;
-    private Long rootId;
-    private Long parentId;
     private BoardCategory boardCategory;
     private String nickname;
     private String title;
+    private String preview;
     private String content;
     private String tag1, tag2, tag3;
     private int readCount, replyCount, likeCount;
