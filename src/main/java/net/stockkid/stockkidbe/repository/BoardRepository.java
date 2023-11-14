@@ -8,7 +8,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface BoardRepository extends JpaRepository<Board, Long> {
 
-    Page<Board> findByRootIdIsNull(Pageable pageable);
-
-    Page<Board> findByRootIdIsNullAndBoardCategory(BoardCategory boardCategory, Pageable pageable);
+    Page<Board> findByBoardCategory(BoardCategory boardCategory, Pageable pageable);
 }

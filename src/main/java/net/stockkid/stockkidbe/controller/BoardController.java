@@ -88,7 +88,7 @@ public class BoardController {
     }
 
     @GetMapping("/readPage")
-    public ResponseEntity<ResponseDTO> readPage(@RequestParam(value = "page", defaultValue = "1") int page, @RequestParam(value = "size", defaultValue = "20") int size, @RequestParam(value = "boardCategory", defaultValue = "ALL") String boardCategory, @RequestParam(value = "sortBy", defaultValue = "boardId") String sortBy) {
+    public ResponseEntity<ResponseDTO> readPage(@RequestParam(value = "page", defaultValue = "1") int page, @RequestParam(value = "size", defaultValue = "20") int size, @RequestParam(value = "boardCategory", defaultValue = "ALL") String boardCategory, @RequestParam(value = "sortBy", defaultValue = "id") String sortBy) {
 
         log.info("--------------readPage--------------");
 
@@ -110,4 +110,26 @@ public class BoardController {
         }
     }
 
+    @GetMapping("/read/{boardId}")
+    public ResponseEntity<ResponseDTO> read(@PathVariable("boardId") Long boardId) {
+
+        log.info("--------------read boardId--------------");
+
+        ResponseDTO responseDTO = new ResponseDTO();
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
+
+        try {
+            BoardReplyDTO boardReplyDTO = boardService.read(boardId);
+            responseDTO.setApiStatus(ResponseStatus.READ_OK);
+            responseDTO.setApiMsg("Read OK");
+            responseDTO.setApiObj(boardReplyDTO);
+            return new ResponseEntity<>(responseDTO, httpHeaders, HttpStatus.OK);
+        } catch (Exception e) {
+            log.info("Read Error : " + e.getMessage());
+            responseDTO.setApiStatus(ResponseStatus.READ_FAIL);
+            responseDTO.setApiMsg(e.getMessage());
+            return new ResponseEntity<>(responseDTO, httpHeaders, HttpStatus.CONFLICT);
+        }
+    }
 }

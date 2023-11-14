@@ -4,10 +4,12 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.stockkid.stockkidbe.dto.BoardPageDTO;
+import net.stockkid.stockkidbe.dto.BoardReplyDTO;
 import net.stockkid.stockkidbe.dto.PostBoardDTO;
 import net.stockkid.stockkidbe.entity.Board;
 import net.stockkid.stockkidbe.entity.BoardCategory;
 import net.stockkid.stockkidbe.entity.MemberInfo;
+import net.stockkid.stockkidbe.entity.Reply;
 import net.stockkid.stockkidbe.repository.BoardRepository;
 import net.stockkid.stockkidbe.repository.MemberInfoRepository;
 import org.springframework.data.domain.Page;
@@ -17,6 +19,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional
         ;
@@ -98,15 +101,34 @@ public class BoardServiceImpl implements BoardService{
 
         Page<Board> boardPage;
         if (Objects.equals(boardCategory, "ALL")) {
-            boardPage = boardRepository.findByRootIdIsNull(pageable);
+            boardPage = boardRepository.findAll(pageable);
         } else {
-            boardPage = boardRepository.findByRootIdIsNullAndBoardCategory(BoardCategory.valueOf(boardCategory), pageable);
+            boardPage = boardRepository.findByBoardCategory(BoardCategory.valueOf(boardCategory), pageable);
         }
 
         BoardPageDTO boardPageDTO = new BoardPageDTO();
         boardPageDTO.setTotalPages(boardPage.getTotalPages());
-        boardPageDTO.setBoardDTOList(boardPage.stream().map(this::entityToDto).toList());
+        boardPageDTO.setBoardDTOList(boardPage.stream().map(this::entityToPreviewDto).toList());
 
         return boardPageDTO;
+    }
+
+    @Override
+    public BoardReplyDTO read(Long boardId) {
+
+        Optional<Board> optionalBoard = boardRepository.findById(boardId);
+        Board existingBoard = optionalBoard.orElseThrow(() -> new IllegalArgumentException("boardId not found"));
+
+        existingBoard.addReadCount();
+
+        BoardReplyDTO boardReplyDTO = new BoardReplyDTO();
+        boardReplyDTO.setBoardDTO(entityToDto(existingBoard));
+
+        List<Reply> replyList = existingBoard.getReplyList();
+        boardReplyDTO.setReplyDTOList(replyList.stream().map(this::replyToReplyDto).toList());
+
+        boardRepository.save(existingBoard);
+
+        return boardReplyDTO;
     }
 }

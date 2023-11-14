@@ -1,9 +1,8 @@
 package net.stockkid.stockkidbe.service;
 
-import net.stockkid.stockkidbe.dto.BoardDTO;
-import net.stockkid.stockkidbe.dto.BoardPageDTO;
-import net.stockkid.stockkidbe.dto.PostBoardDTO;
+import net.stockkid.stockkidbe.dto.*;
 import net.stockkid.stockkidbe.entity.Board;
+import net.stockkid.stockkidbe.entity.Reply;
 
 public interface BoardService {
 
@@ -15,7 +14,9 @@ public interface BoardService {
 
     BoardPageDTO readPage(int page, int size, String boardCategory, String sortBy);
 
-    default BoardDTO entityToDto(Board entity) {
+    BoardReplyDTO read(Long boardId);
+
+    default BoardDTO entityToPreviewDto(Board entity) {
         return BoardDTO.builder()
                 .boardId(entity.getId())
                 .memberId(entity.getMemberInfo().getMemberId())
@@ -31,6 +32,26 @@ public interface BoardService {
                 .likeCount(entity.getLikeCount())
                 .regDate(entity.getRegDate())
                 .modDate(entity.getModDate())
+                .build();
+    }
+
+    default BoardDTO entityToDto(Board entity) {
+        BoardDTO boardDTO = entityToPreviewDto(entity);
+        boardDTO.setContent(entity.getContent());
+
+        return boardDTO;
+    }
+
+    default ReplyDTO replyToReplyDto(Reply reply){
+        return ReplyDTO.builder()
+                .replyId(reply.getId())
+                .parentId(reply.getParentId())
+                .memberId(reply.getMemberInfo().getMemberId())
+                .nickname(reply.getNickname())
+                .content(reply.getContent())
+                .likeCount(reply.getLikeCount())
+                .regDate(reply.getRegDate())
+                .modDate(reply.getModDate())
                 .build();
     }
 }
