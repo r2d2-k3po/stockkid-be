@@ -88,7 +88,7 @@ public class BoardController {
     }
 
     @GetMapping("/permit/board/readPage")
-    public ResponseEntity<ResponseDTO> readPage(@RequestParam(value = "page", defaultValue = "1") int page, @RequestParam(value = "size", defaultValue = "20") int size, @RequestParam(value = "boardCategory", defaultValue = "ALL") String boardCategory, @RequestParam(value = "sortBy", defaultValue = "id") String sortBy) {
+    public ResponseEntity<ResponseDTO> readPage(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "20") int size, @RequestParam(defaultValue = "ALL") String boardCategory, @RequestParam(defaultValue = "id") String sortBy) {
 
         log.info("--------------readPage--------------");
 
@@ -150,6 +150,29 @@ public class BoardController {
         } catch (Exception e) {
             log.info("Write Error : " + e.getMessage());
             responseDTO.setApiStatus(ResponseStatus.WRITE_FAIL);
+            responseDTO.setApiMsg(e.getMessage());
+            return new ResponseEntity<>(responseDTO, httpHeaders, HttpStatus.CONFLICT);
+        }
+    }
+
+    @GetMapping("/permit/board/searchPage")
+    public ResponseEntity<ResponseDTO> searchPage(@RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "20") int size, @RequestParam(defaultValue = "ALL") String boardCategory, @RequestParam(defaultValue = "id") String sortBy, @RequestParam String tag) {
+
+        log.info("--------------searchPage--------------");
+
+        ResponseDTO responseDTO = new ResponseDTO();
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
+
+        try {
+            BoardPageDTO boardPageDTO = boardService.searchPage(page, size, boardCategory, sortBy, tag);
+            responseDTO.setApiStatus(ResponseStatus.READ_OK);
+            responseDTO.setApiMsg("Read OK");
+            responseDTO.setApiObj(boardPageDTO);
+            return new ResponseEntity<>(responseDTO, httpHeaders, HttpStatus.OK);
+        } catch (Exception e) {
+            log.info("Read Error : " + e.getMessage());
+            responseDTO.setApiStatus(ResponseStatus.READ_FAIL);
             responseDTO.setApiMsg(e.getMessage());
             return new ResponseEntity<>(responseDTO, httpHeaders, HttpStatus.CONFLICT);
         }

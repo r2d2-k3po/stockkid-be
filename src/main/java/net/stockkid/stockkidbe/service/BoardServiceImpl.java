@@ -48,9 +48,9 @@ public class BoardServiceImpl implements BoardService{
         board.setTitle(dto.getTitle());
         board.setPreview(dto.getPreview());
         board.setContent(dto.getContent());
-        board.setTag1(dto.getTag1());
-        board.setTag2(dto.getTag2());
-        board.setTag3(dto.getTag3());
+        board.setTag1(dto.getTag1().toLowerCase());
+        board.setTag2(dto.getTag2().toLowerCase());
+        board.setTag3(dto.getTag3().toLowerCase());
         board.setMemberInfo(memberInfo);
 
         memberInfo.getBoardList().add(board);
@@ -72,9 +72,9 @@ public class BoardServiceImpl implements BoardService{
             existingBoard.setTitle(dto.getTitle());
             existingBoard.setPreview(dto.getPreview());
             existingBoard.setContent(dto.getContent());
-            existingBoard.setTag1(dto.getTag1());
-            existingBoard.setTag2(dto.getTag2());
-            existingBoard.setTag3(dto.getTag3());
+            existingBoard.setTag1(dto.getTag1().toLowerCase());
+            existingBoard.setTag2(dto.getTag2().toLowerCase());
+            existingBoard.setTag3(dto.getTag3().toLowerCase());
 
             boardRepository.save(existingBoard);
         } else throw new IllegalArgumentException("memberId not match");
@@ -162,5 +162,24 @@ public class BoardServiceImpl implements BoardService{
                 throw new IllegalArgumentException("illegal like number");
             }
         }
+    }
+
+    @Override
+    public BoardPageDTO searchPage(int page, int size, String boardCategory, String sortBy, String tag) {
+
+        Pageable pageable = PageRequest.of(page-1, size, Sort.by(Sort.Direction.DESC, sortBy));
+
+        Page<Board> boardPage;
+        if (Objects.equals(boardCategory, "ALL")) {
+            boardPage = boardRepository.findByTag(tag.toLowerCase(), pageable);
+        } else {
+            boardPage = boardRepository.findByBoardCategoryAndTag(BoardCategory.valueOf(boardCategory), tag.toLowerCase(), pageable);
+        }
+
+        BoardPageDTO boardPageDTO = new BoardPageDTO();
+        boardPageDTO.setTotalPages(boardPage.getTotalPages());
+        boardPageDTO.setBoardDTOList(boardPage.stream().map(this::entityToPreviewDto).toList());
+
+        return boardPageDTO;
     }
 }

@@ -18,6 +18,8 @@ public interface BoardService {
 
     void like(LikeDTO likeDTO);
 
+    BoardPageDTO searchPage(int page, int size, String boardCategory, String sortBy, String tag);
+
     default BoardDTO entityToPreviewDto(Board entity) {
         return BoardDTO.builder()
                 .boardId(entity.getId())
