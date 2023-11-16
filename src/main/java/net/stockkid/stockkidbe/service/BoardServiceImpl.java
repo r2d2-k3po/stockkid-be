@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.stockkid.stockkidbe.dto.BoardPageDTO;
 import net.stockkid.stockkidbe.dto.BoardReplyDTO;
+import net.stockkid.stockkidbe.dto.LikeDTO;
 import net.stockkid.stockkidbe.dto.PostBoardDTO;
 import net.stockkid.stockkidbe.entity.Board;
 import net.stockkid.stockkidbe.entity.BoardCategory;
@@ -23,6 +24,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional
         ;
+import java.util.Set;
+
 @Log4j2
 @Service
 @RequiredArgsConstructor
@@ -130,5 +133,34 @@ public class BoardServiceImpl implements BoardService{
         boardRepository.save(existingBoard);
 
         return boardReplyDTO;
+    }
+
+    @Override
+    public void like(LikeDTO likeDTO) {
+
+        Long memberId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Optional<MemberInfo> optionalMemberInfo = memberInfoRepository.findById(memberId);
+        MemberInfo existingMemberInfo = optionalMemberInfo.orElseThrow(() -> new IllegalArgumentException("memberId not found"));
+
+        Optional<Board> optionalBoard = boardRepository.findById(likeDTO.getId());
+        Board existingBoard = optionalBoard.orElseThrow(() -> new IllegalArgumentException("boardId not found"));
+
+        Set<Board> likeBoardSet = existingMemberInfo.getLikeBoardSet();
+
+        if (likeBoardSet.contains(existingBoard)) {
+            throw new IllegalArgumentException("like already counted");
+        } else {
+            int number = likeDTO.getNumber();
+            if (number == 1 || number == -1 ) {
+                likeBoardSet.add(existingBoard);
+                existingBoard.addLikeCount(number);
+                existingBoard.getMemberInfo().addLikeCount(number);
+
+                memberInfoRepository.save(existingMemberInfo);
+                boardRepository.save(existingBoard);
+            } else {
+                throw new IllegalArgumentException("illegal like number");
+            }
+        }
     }
 }

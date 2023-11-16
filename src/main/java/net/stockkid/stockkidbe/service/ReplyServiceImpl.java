@@ -3,6 +3,7 @@ package net.stockkid.stockkidbe.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import net.stockkid.stockkidbe.dto.LikeDTO;
 import net.stockkid.stockkidbe.dto.PostReplyDTO;
 import net.stockkid.stockkidbe.entity.Board;
 import net.stockkid.stockkidbe.entity.MemberInfo;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 @Log4j2
 @Service
@@ -80,5 +82,34 @@ public class ReplyServiceImpl implements ReplyService {
 
             replyRepository.save(existingReply);
         } else throw new IllegalArgumentException("memberId not match");
+    }
+
+    @Override
+    public void like(LikeDTO likeDTO) {
+
+        Long memberId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Optional<MemberInfo> optionalMemberInfo = memberInfoRepository.findById(memberId);
+        MemberInfo existingMemberInfo = optionalMemberInfo.orElseThrow(() -> new IllegalArgumentException("memberId not found"));
+
+        Optional<Reply> optionalReply = replyRepository.findById(likeDTO.getId());
+        Reply existingReply = optionalReply.orElseThrow(() -> new IllegalArgumentException("replyId not found"));
+
+        Set<Reply> likeReplySet = existingMemberInfo.getLikeReplySet();
+
+        if (likeReplySet.contains(existingReply)) {
+            throw new IllegalArgumentException("like already counted");
+        } else {
+            int number = likeDTO.getNumber();
+            if (number == 1 || number == -1 ) {
+                likeReplySet.add(existingReply);
+                existingReply.addLikeCount(number);
+                existingReply.getMemberInfo().addLikeCount(number);
+
+                memberInfoRepository.save(existingMemberInfo);
+                replyRepository.save(existingReply);
+            } else {
+                throw new IllegalArgumentException("illegal like number");
+            }
+        }
     }
 }

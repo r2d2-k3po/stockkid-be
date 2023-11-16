@@ -31,7 +31,7 @@ public class Reply extends BaseEntity{
     @NotNull
     private @Setter int likeCount = 0;
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(cascade = CascadeType.PERSIST, optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     @ToString.Exclude
     private @Setter MemberInfo memberInfo;

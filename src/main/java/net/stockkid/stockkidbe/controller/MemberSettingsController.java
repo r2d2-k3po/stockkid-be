@@ -17,7 +17,7 @@ import java.nio.charset.StandardCharsets;
 
 @RestController
 @Log4j2
-@RequestMapping("/api/access/memberSettings")
+@RequestMapping("/api")
 @RequiredArgsConstructor
 public class MemberSettingsController {
 
@@ -26,7 +26,7 @@ public class MemberSettingsController {
     @Value("${default.settings.memberId}")
     private Long defaultSettingsMemberId;
 
-    @PostMapping("/saveScreenComposition")
+    @PostMapping("/access/memberSettings/saveScreenComposition")
     public ResponseEntity<ResponseDTO> saveScreenComposition(@RequestBody ScreenCompositionDTO screenCompositionDTO) {
 
         log.info("--------------saveScreenComposition--------------");
@@ -48,7 +48,7 @@ public class MemberSettingsController {
         }
     }
 
-    @GetMapping("/loadScreenSetting/{number}")
+    @GetMapping("/access/memberSettings/loadScreenSetting/{number}")
     public ResponseEntity<ResponseDTO> loadScreenSetting(@PathVariable("number") String number) {
 
         log.info("--------------loadScreenSetting--------------");
@@ -58,7 +58,7 @@ public class MemberSettingsController {
         return loadScreenSettingById(memberId, number);
     }
 
-    @GetMapping("/loadScreenSettingDefault/{number}")
+    @GetMapping("/permit/memberSettings/loadScreenSettingDefault/{number}")
     public ResponseEntity<ResponseDTO> loadScreenSettingDefault(@PathVariable("number") String number) {
 
         log.info("--------------loadScreenSettingDefault--------------");
@@ -86,7 +86,7 @@ public class MemberSettingsController {
         }
     }
 
-    @GetMapping("/loadScreenTitles")
+    @GetMapping("/access/memberSettings/loadScreenTitles")
     public ResponseEntity<ResponseDTO> loadScreenTitles() {
 
         log.info("--------------loadScreenTitles--------------");
@@ -96,7 +96,7 @@ public class MemberSettingsController {
         return loadScreenTitlesById(memberId);
     }
 
-    @GetMapping("/loadScreenTitlesDefault")
+    @GetMapping("/permit/memberSettings/loadScreenTitlesDefault")
     public ResponseEntity<ResponseDTO> loadScreenTitlesDefault() {
 
         log.info("--------------loadScreenTitlesDefault--------------");

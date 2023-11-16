@@ -16,6 +16,8 @@ public interface BoardService {
 
     BoardReplyDTO read(Long boardId);
 
+    void like(LikeDTO likeDTO);
+
     default BoardDTO entityToPreviewDto(Board entity) {
         return BoardDTO.builder()
                 .boardId(entity.getId())

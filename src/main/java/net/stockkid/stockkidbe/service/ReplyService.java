@@ -1,5 +1,6 @@
 package net.stockkid.stockkidbe.service;
 
+import net.stockkid.stockkidbe.dto.LikeDTO;
 import net.stockkid.stockkidbe.dto.PostReplyDTO;
 
 public interface ReplyService {
@@ -9,4 +10,6 @@ public interface ReplyService {
     void modify(PostReplyDTO dto);
 
     void delete(Long replyId);
+
+    void like(LikeDTO likeDTO);
 }

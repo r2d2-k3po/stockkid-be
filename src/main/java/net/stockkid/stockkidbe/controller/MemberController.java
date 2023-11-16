@@ -23,7 +23,7 @@ public class MemberController {
 
     private final MemberService memberService;
 
-    @PostMapping("/member/signup")
+    @PostMapping("/permit/member/signup")
     public ResponseEntity<ResponseDTO> signup(@RequestBody AuthDTO authDTO) {
 
         log.info("--------------signup--------------");

@@ -52,7 +52,7 @@ public class SecurityConfig {
         http
                 .cors(withDefaults())
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/api/member/signup").permitAll()
+                        .requestMatchers("/api/permit/**").permitAll()
                         .requestMatchers("/api/access/**").hasRole("USER")
                         .anyRequest().denyAll()
                 )
@@ -82,7 +82,7 @@ public class SecurityConfig {
     @Bean
     public ApiLoginFilter apiLoginFilter() {
 
-        ApiLoginFilter apiLoginFilter = new ApiLoginFilter("/api/member/login");
+        ApiLoginFilter apiLoginFilter = new ApiLoginFilter("/api/login");
         apiLoginFilter.setAuthenticationManager(authenticationManager());
         apiLoginFilter.setAuthenticationFailureHandler(new ApiLoginFailureHandler());
 

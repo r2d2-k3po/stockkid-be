@@ -5,7 +5,9 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @ToString
@@ -37,6 +39,16 @@ public class MemberInfo {
     @OrderBy("id desc")
     @ToString.Exclude
     private @Setter List<Reply> replyList = new ArrayList<>();
+
+    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @JoinTable(name = "member_like_board", joinColumns = @JoinColumn(name = "member_id"), inverseJoinColumns = @JoinColumn(name = "board_id"))
+    @ToString.Exclude
+    private @Setter Set<Board> likeBoardSet = new HashSet<>();
+
+    @ManyToMany(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @JoinTable(name = "member_like_reply", joinColumns = @JoinColumn(name = "member_id"), inverseJoinColumns = @JoinColumn(name = "reply_id"))
+    @ToString.Exclude
+    private @Setter Set<Reply> likeReplySet = new HashSet<>();
 
     public void addLikeCount(int number) {
         likeCount += number;
