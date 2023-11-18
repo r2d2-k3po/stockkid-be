@@ -45,6 +45,6 @@ public class MemberServiceTests {
 
     @Test
     public void deleteUserTest() {
-        memberService.deleteUser("test1");
+        memberService.deleteUser(1L);
     }
 }

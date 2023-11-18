@@ -27,7 +27,7 @@ public class MemberServiceImpl implements MemberService {
 
     // permitAll
     @Override
-    public void createUser(MemberDTO dto) {
+    public Long createUser(MemberDTO dto) {
 
         if (userExists(dto.getUsername())) {
             throw new IllegalArgumentException("User already exists");
@@ -44,6 +44,8 @@ public class MemberServiceImpl implements MemberService {
             member.setMemberSettings(memberSettings);
             member.setMemberInfo(memberInfo);
             memberRepository.save(member);
+
+            return member.getId();
         }
     }
 
@@ -74,10 +76,10 @@ public class MemberServiceImpl implements MemberService {
 
     // ADMIN
     @Override
-    public void deleteUser(String username) {
+    public void deleteUser(Long id) {
 
-        Optional<Member> optionalUser = memberRepository.findByUsername(username);
-        Member user = optionalUser.orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        Optional<Member> optionalUser = memberRepository.findById(id);
+        Member user = optionalUser.orElseThrow(() -> new UsernameNotFoundException("memberId not found"));
 
         memberRepository.delete(user);
 
@@ -125,9 +127,9 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public void updateRefreshToken(String username, String refreshToken) {
-        Optional<Member> optionalUser = memberRepository.findByUsername(username);
-        Member existingUser = optionalUser.orElseThrow(() -> new IllegalArgumentException("User not found"));
+    public void updateRefreshToken(Long id, String refreshToken) {
+        Optional<Member> optionalUser = memberRepository.findById(id);
+        Member existingUser = optionalUser.orElseThrow(() -> new IllegalArgumentException("memberId not found"));
 
         existingUser.setRefreshToken(refreshToken);
         memberRepository.save(existingUser);

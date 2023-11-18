@@ -32,7 +32,7 @@ public class TokenUtil {
         log.info("successful accessToken : " + tokensDTO.getAccessToken());
         log.info("successful refreshToken : " + tokensDTO.getRefreshToken());
 
-        memberService.updateRefreshToken(sub, tokensDTO.getRefreshToken());
+        memberService.updateRefreshToken(sid, tokensDTO.getRefreshToken());
 
         return tokensDTO;
     }
@@ -50,10 +50,10 @@ public class TokenUtil {
 
     public void invalidateToken(String sub, String refreshToken) throws Exception {
 
-        String refreshTokenDB = memberService.loadUserByUsername(sub).getRefreshToken();
+        MemberDTO memberDTO = memberService.loadUserByUsername(sub);
 
-        if (Objects.equals(refreshToken, refreshTokenDB)) {
-            memberService.updateRefreshToken(sub, null);
+        if (Objects.equals(refreshToken, memberDTO.getRefreshToken())) {
+            memberService.updateRefreshToken(memberDTO.getId(), null);
         } else {
             throw new Exception("refreshToken not valid");
         }

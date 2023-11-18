@@ -95,10 +95,10 @@ public class ApiGoogleFilter extends OncePerRequestFilter {
                     newMemberDTO.setMemberSocial(MemberSocial.GGL);
 
                     log.info("create new Google user");
-                    memberService.createUser(newMemberDTO);
+                    Long sid = memberService.createUser(newMemberDTO);
 
                     log.info("create tokens for new user");
-                    TokensDTO tokensDTO = tokenUtil.generateTokens(null, email, MemberRole.USER.name(), MemberSocial.GGL.name());
+                    TokensDTO tokensDTO = tokenUtil.generateTokens(sid, email, MemberRole.USER.name(), MemberSocial.GGL.name());
 
                     response.setStatus(HttpServletResponse.SC_CREATED);
                     ResponseDTO responseDTO = new ResponseDTO(ResponseStatus.LOGIN_OK, "Login OK", tokensDTO);

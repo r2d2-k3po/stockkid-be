@@ -65,10 +65,10 @@ public class ApiKakaoFilter extends OncePerRequestFilter {
                     newMemberDTO.setMemberSocial(MemberSocial.KKO);
 
                     log.info("create new Kakao user");
-                    memberService.createUser(newMemberDTO);
+                    Long sid = memberService.createUser(newMemberDTO);
 
                     log.info("create tokens for new user");
-                    TokensDTO tokensDTO = tokenUtil.generateTokens(null, email, MemberRole.USER.name(), MemberSocial.KKO.name());
+                    TokensDTO tokensDTO = tokenUtil.generateTokens(sid, email, MemberRole.USER.name(), MemberSocial.KKO.name());
 
                     response.setStatus(HttpServletResponse.SC_CREATED);
                     ResponseDTO responseDTO = new ResponseDTO(ResponseStatus.LOGIN_OK, "Login OK", tokensDTO);

@@ -25,14 +25,12 @@ public class Board extends BaseEntity {
     @Column(name = "board_id")
     private Long id;
 
-    @Column
     @Enumerated(EnumType.STRING)
     private @Setter BoardCategory boardCategory;
 
     @NotNull
     private @Setter String nickname;
 
-    @Column
     private @Setter String title;
 
     @NotNull
@@ -45,13 +43,10 @@ public class Board extends BaseEntity {
     @Basic(fetch = FetchType.LAZY)
     private @Setter String content;
 
-    @Column
     private @Setter String tag1;
 
-    @Column
     private @Setter String tag2;
 
-    @Column
     private @Setter String tag3;
 
     @NotNull

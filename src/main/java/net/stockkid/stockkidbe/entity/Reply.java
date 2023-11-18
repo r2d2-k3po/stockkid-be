@@ -17,7 +17,6 @@ public class Reply extends BaseEntity{
     @Column(name = "reply_id")
     private Long id;
 
-    @Column
     private @Setter Long parentId;
 
     @NotNull

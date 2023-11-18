@@ -5,11 +5,11 @@ import net.stockkid.stockkidbe.entity.Member;
 
 public interface MemberService {
 
-    void createUser(MemberDTO dto);
+    Long createUser(MemberDTO dto);
 
     void updateUser(MemberDTO dto);
 
-    void deleteUser(String username);
+    void deleteUser(Long id);
 
     void changePassword(String oldPassword, String newPassword);
 
@@ -17,7 +17,7 @@ public interface MemberService {
 
     void disableSocialUser(Long id);
 
-    void updateRefreshToken(String username, String refreshToken);
+    void updateRefreshToken(Long id, String refreshToken);
 
     boolean userExists(String username);
 
