@@ -6,7 +6,9 @@ import net.stockkid.stockkidbe.entity.MemberRole;
 import net.stockkid.stockkidbe.repository.MemberRepository;
 import net.stockkid.stockkidbe.security.filter.*;
 import net.stockkid.stockkidbe.security.handler.ApiLoginFailureHandler;
-import net.stockkid.stockkidbe.security.service.UserDetailsServiceImpl;
+import net.stockkid.stockkidbe.security.util.IoUtil;
+import net.stockkid.stockkidbe.security.util.JwtUtil;
+import net.stockkid.stockkidbe.service.MemberService;
 import net.stockkid.stockkidbe.service.MemberServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -73,16 +75,27 @@ public class SecurityConfig {
     }
 
     @Bean
+    IoUtil ioUtil() { return new IoUtil(); }
+
+    @Bean
+    JwtUtil jwtUtil() { return new JwtUtil(); }
+
+    @Bean
+    MemberService memberService() {
+        return new MemberServiceImpl(memberRepository, passwordEncoder(), jwtUtil());
+    }
+
+    @Bean
     public AuthenticationManager authenticationManager() {
         DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider(passwordEncoder());
-        daoAuthenticationProvider.setUserDetailsService(new UserDetailsServiceImpl(memberRepository));
+        daoAuthenticationProvider.setUserDetailsService(memberService());
         return new ProviderManager(List.of(daoAuthenticationProvider));
     }
 
     @Bean
     public ApiLoginFilter apiLoginFilter() {
 
-        ApiLoginFilter apiLoginFilter = new ApiLoginFilter("/api/login");
+        ApiLoginFilter apiLoginFilter = new ApiLoginFilter("/api/login", ioUtil(), memberService());
         apiLoginFilter.setAuthenticationManager(authenticationManager());
         apiLoginFilter.setAuthenticationFailureHandler(new ApiLoginFailureHandler());
 
@@ -91,27 +104,27 @@ public class SecurityConfig {
 
     @Bean
     public ApiAccessFilter apiAccessFilter() {
-        return new ApiAccessFilter(new AntPathRequestMatcher("/api/access/**"));
+        return new ApiAccessFilter(new AntPathRequestMatcher("/api/access/**"), ioUtil(), jwtUtil());
     }
 
     @Bean
     public ApiRefreshFilter apiRefreshFilter() {
-        return new ApiRefreshFilter(new AntPathRequestMatcher("/api/refresh/**"));
+        return new ApiRefreshFilter(new AntPathRequestMatcher("/api/refresh/**"), ioUtil(), jwtUtil(), memberService());
     }
 
     @Bean
     public ApiGoogleFilter apiGoogleFilter() {
-        return new ApiGoogleFilter(new AntPathRequestMatcher("/api/google/**"), new MemberServiceImpl(memberRepository, passwordEncoder()));
+        return new ApiGoogleFilter(new AntPathRequestMatcher("/api/google/**"), ioUtil(), memberService());
     }
 
     @Bean
     public ApiNaverFilter apiNaverFilter() {
-        return new ApiNaverFilter(new AntPathRequestMatcher("/api/naver/**"), new MemberServiceImpl(memberRepository, passwordEncoder()));
+        return new ApiNaverFilter(new AntPathRequestMatcher("/api/naver/**"), ioUtil(), memberService());
     }
 
     @Bean
     public ApiKakaoFilter apiKakaoFilter() {
-        return new ApiKakaoFilter(new AntPathRequestMatcher("/api/kakao/**"), new MemberServiceImpl(memberRepository, passwordEncoder()));
+        return new ApiKakaoFilter(new AntPathRequestMatcher("/api/kakao/**"), ioUtil(), jwtUtil(), memberService());
     }
 
     @Bean

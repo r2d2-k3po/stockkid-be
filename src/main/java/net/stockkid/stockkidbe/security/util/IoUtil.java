@@ -8,7 +8,6 @@ import net.stockkid.stockkidbe.dto.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -16,9 +15,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.security.SecureRandom;
 
 @Log4j2
-@Component
 public class IoUtil {
 
     @Value("${spring.security.oauth2.client.registration.naver.client-id}")
@@ -129,5 +128,19 @@ public class IoUtil {
                 .retrieve()
                 .bodyToMono(KakaoTokenDTO.class)
                 .block();
+    }
+
+    public String generateRandomPassword(int length) {
+
+        String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+";
+        StringBuilder password = new StringBuilder();
+        SecureRandom random = new SecureRandom();
+
+        for (int i = 0; i < length; i++) {
+            int randomIndex = random.nextInt(CHARACTERS.length());
+            char randomChar = CHARACTERS.charAt(randomIndex);
+            password.append(randomChar);
+        }
+        return password.toString();
     }
 }

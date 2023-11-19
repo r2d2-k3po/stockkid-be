@@ -4,36 +4,25 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.stockkid.stockkidbe.dto.*;
 import net.stockkid.stockkidbe.entity.MemberRole;
 import net.stockkid.stockkidbe.entity.MemberSocial;
 import net.stockkid.stockkidbe.security.util.IoUtil;
-import net.stockkid.stockkidbe.security.util.TokenUtil;
 import net.stockkid.stockkidbe.service.MemberService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
 @Log4j2
+@RequiredArgsConstructor
 public class ApiNaverFilter  extends OncePerRequestFilter {
 
-    @Autowired
-    private TokenUtil tokenUtil;
-
-    @Autowired
-    private IoUtil ioUtil;
-
     private final AntPathRequestMatcher antPathRequestMatcher;
-
+    private final IoUtil ioUtil;
     private final MemberService memberService;
-
-    public ApiNaverFilter(AntPathRequestMatcher antPathRequestMatcher, MemberService memberService) {
-        this.antPathRequestMatcher = antPathRequestMatcher;
-        this.memberService = memberService;
-    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -54,19 +43,19 @@ public class ApiNaverFilter  extends OncePerRequestFilter {
 
                 String email = naverUserInfoDTO.getEmail();
 
-                MemberDTO memberDTO = memberService.loadUserByUsername(email);
+                MemberDTO memberDTO = memberService.findUserByUsername(email);
 
                 if (memberDTO == null) {
                     MemberDTO newMemberDTO = new MemberDTO();
                     newMemberDTO.setUsername(email);
-                    newMemberDTO.setPassword(tokenUtil.generateRandomPassword(30));
+                    newMemberDTO.setPassword(ioUtil.generateRandomPassword(30));
                     newMemberDTO.setMemberSocial(MemberSocial.NAV);
 
                     log.info("create new Naver user");
                     Long sid = memberService.createUser(newMemberDTO);
 
                     log.info("create tokens for new user");
-                    TokensDTO tokensDTO = tokenUtil.generateTokens(sid, email, MemberRole.USER.name(), MemberSocial.NAV.name());
+                    TokensDTO tokensDTO = memberService.generateTokens(sid, email, MemberRole.USER.name(), MemberSocial.NAV.name());
 
                     response.setStatus(HttpServletResponse.SC_CREATED);
                     ResponseDTO responseDTO = new ResponseDTO(ResponseStatus.LOGIN_OK, "Login OK", tokensDTO);
@@ -81,7 +70,7 @@ public class ApiNaverFilter  extends OncePerRequestFilter {
 
                     if (new AntPathRequestMatcher("/api/naver/member/signin").matches(request)) {
                         log.info("create tokens for existing user");
-                        TokensDTO tokensDTO = tokenUtil.generateTokens(memberDTO.getId(), email, memberDTO.getMemberRole().name(), MemberSocial.NAV.name());
+                        TokensDTO tokensDTO = memberService.generateTokens(memberDTO.getId(), email, memberDTO.getMemberRole().name(), MemberSocial.NAV.name());
 
                         response.setStatus(HttpServletResponse.SC_OK);
                         ResponseDTO responseDTO = new ResponseDTO(ResponseStatus.LOGIN_OK, "Login OK", tokensDTO);

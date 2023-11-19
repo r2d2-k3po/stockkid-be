@@ -34,7 +34,7 @@ public class MemberServiceTests {
 
     @Test
     public void loadUserTest() {
-        MemberDTO memberDTO = memberService.loadUserByUsername("DefaultSettings@stockkid.net");
+        MemberDTO memberDTO = memberService.findUserByUsername("DefaultSettings@stockkid.net");
 
         System.out.println(memberDTO.getId());
         System.out.println(memberDTO.getPassword());

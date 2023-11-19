@@ -1,9 +1,11 @@
 package net.stockkid.stockkidbe.service;
 
 import net.stockkid.stockkidbe.dto.MemberDTO;
+import net.stockkid.stockkidbe.dto.TokensDTO;
 import net.stockkid.stockkidbe.entity.Member;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
-public interface MemberService {
+public interface MemberService extends UserDetailsService {
 
     Long createUser(MemberDTO dto);
 
@@ -17,11 +19,15 @@ public interface MemberService {
 
     void disableSocialUser(Long id);
 
-    void updateRefreshToken(Long id, String refreshToken);
-
     boolean userExists(String username);
 
-    MemberDTO loadUserByUsername(String username);
+    MemberDTO findUserByUsername(String username);
+
+    TokensDTO generateTokens(Long sid, String sub, String rol, String soc) throws Exception;
+
+    TokensDTO rotateTokens(String sub, String rol, String soc, String refreshToken) throws Exception;
+
+    void invalidateToken(String sub, String refreshToken) throws Exception;
 
     default Member dtoToEntity(MemberDTO dto) {
         return Member.builder()

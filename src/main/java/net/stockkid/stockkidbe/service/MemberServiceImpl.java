@@ -4,16 +4,24 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.stockkid.stockkidbe.dto.MemberDTO;
+import net.stockkid.stockkidbe.dto.TokensDTO;
 import net.stockkid.stockkidbe.entity.Member;
 import net.stockkid.stockkidbe.entity.MemberInfo;
 import net.stockkid.stockkidbe.entity.MemberSettings;
+import net.stockkid.stockkidbe.entity.MemberSocial;
 import net.stockkid.stockkidbe.repository.MemberRepository;
+import net.stockkid.stockkidbe.security.util.JwtUtil;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
+import java.util.Objects;
 import java.util.Optional;
 
 @Log4j2
@@ -24,6 +32,7 @@ public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
     // permitAll
     @Override
@@ -127,29 +136,94 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public void updateRefreshToken(Long id, String refreshToken) {
-        Optional<Member> optionalUser = memberRepository.findById(id);
-        Member existingUser = optionalUser.orElseThrow(() -> new IllegalArgumentException("memberId not found"));
-
-        existingUser.setRefreshToken(refreshToken);
-        memberRepository.save(existingUser);
-    }
-
-    @Override
     public boolean userExists(String username) {
 
         return memberRepository.existsByUsername(username);
     }
 
     @Override
-    public MemberDTO loadUserByUsername(String username) {
+    public UserDetails loadUserByUsername(String username) {
+
+        log.info("UserDetailsService loadUserByUsername " + username);
+
+        Optional<Member> optionalUser = memberRepository.findByUsername(username);
+        Member member = optionalUser.orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        if (member.getMemberSocial() != MemberSocial.UP) throw new UsernameNotFoundException("User not found");
+
+        log.info("----------------------------------------------");
+        log.info(member);
+
+        return new User(
+                member.getUsername(),
+                member.getPassword(),
+                member.isEnabled(),
+                member.isAccountNonExpired(),
+                member.isCredentialsNonExpired(),
+                member.isAccountNonLocked(),
+                Collections.singleton(new SimpleGrantedAuthority("ROLE_" + member.getMemberRole().name()))
+        );
+    }
+
+    @Override
+    public MemberDTO findUserByUsername(String username) {
 
         Optional<Member> result = memberRepository.findByUsername(username);
-        if (result.isEmpty()) {
-            return null;
+        return result.map(this::entityToDto).orElse(null);
+    }
+
+    public TokensDTO generateTokens(Long sid, String sub, String rol, String soc) throws Exception {
+
+        Member existingUser;
+        if (sid == null) {
+            Optional<Member> optionalUser = memberRepository.findByUsername(sub);
+            existingUser = optionalUser.orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        } else {
+            Optional<Member> optionalUser = memberRepository.findById(sid);
+            existingUser = optionalUser.orElseThrow(() -> new IllegalArgumentException("memberId not found"));
         }
-        Member entity = result.get();
-        return entityToDto(entity);
+
+        return generateTokensDTO(existingUser, sub, rol, soc);
+    }
+
+    public TokensDTO rotateTokens(String sub, String rol, String soc, String refreshToken) throws Exception {
+
+        Optional<Member> optionalUser = memberRepository.findByUsername(sub);
+        Member existingUser = optionalUser.orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        if (Objects.equals(refreshToken, existingUser.getRefreshToken())) {
+            return generateTokensDTO(existingUser, sub, rol, soc);
+        } else {
+            throw new Exception("refreshToken not valid");
+        }
+    }
+
+    private TokensDTO generateTokensDTO(Member existingUser, String sub, String rol, String soc) throws Exception {
+
+        TokensDTO tokensDTO = new TokensDTO();
+        tokensDTO.setAccessToken(jwtUtil.generateAccessToken(existingUser.getId(), rol));
+        tokensDTO.setRefreshToken(jwtUtil.generateRefreshToken(sub, rol, soc));
+
+        log.info("successful accessToken : " + tokensDTO.getAccessToken());
+        log.info("successful refreshToken : " + tokensDTO.getRefreshToken());
+
+        existingUser.setRefreshToken(tokensDTO.getRefreshToken());
+        memberRepository.save(existingUser);
+
+        return tokensDTO;
+    }
+
+    public void invalidateToken(String sub, String refreshToken) throws Exception {
+
+        Optional<Member> optionalUser = memberRepository.findByUsername(sub);
+        Member existingUser = optionalUser.orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        if (Objects.equals(refreshToken, existingUser.getRefreshToken())) {
+            existingUser.setRefreshToken(null);
+            memberRepository.save(existingUser);
+        } else {
+            throw new Exception("refreshToken not valid");
+        }
     }
 
 // STAFF

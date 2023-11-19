@@ -10,14 +10,13 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.stockkid.stockkidbe.dto.*;
 import net.stockkid.stockkidbe.entity.MemberRole;
 import net.stockkid.stockkidbe.entity.MemberSocial;
 import net.stockkid.stockkidbe.security.util.IoUtil;
-import net.stockkid.stockkidbe.security.util.TokenUtil;
 import net.stockkid.stockkidbe.service.MemberService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -26,13 +25,8 @@ import java.io.IOException;
 import java.util.Collections;
 
 @Log4j2
+@RequiredArgsConstructor
 public class ApiGoogleFilter extends OncePerRequestFilter {
-
-    @Autowired
-    private TokenUtil tokenUtil;
-
-    @Autowired
-    private IoUtil ioUtil;
 
     @Value("${spring.security.oauth2.client.registration.google.client-id}")
     private String googleClientId;
@@ -41,13 +35,8 @@ public class ApiGoogleFilter extends OncePerRequestFilter {
     private String googleClientSecret;
 
     private final AntPathRequestMatcher antPathRequestMatcher;
-
+    private final IoUtil ioUtil;
     private final MemberService memberService;
-
-    public ApiGoogleFilter(AntPathRequestMatcher antPathRequestMatcher, MemberService memberService) {
-        this.antPathRequestMatcher = antPathRequestMatcher;
-        this.memberService = memberService;
-    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -86,19 +75,19 @@ public class ApiGoogleFilter extends OncePerRequestFilter {
                     throw new Exception("Email not verified.");
                 }
 
-                MemberDTO memberDTO = memberService.loadUserByUsername(email);
+                MemberDTO memberDTO = memberService.findUserByUsername(email);
 
                 if (memberDTO == null) {
                     MemberDTO newMemberDTO = new MemberDTO();
                     newMemberDTO.setUsername(email);
-                    newMemberDTO.setPassword(tokenUtil.generateRandomPassword(30));
+                    newMemberDTO.setPassword(ioUtil.generateRandomPassword(30));
                     newMemberDTO.setMemberSocial(MemberSocial.GGL);
 
                     log.info("create new Google user");
                     Long sid = memberService.createUser(newMemberDTO);
 
                     log.info("create tokens for new user");
-                    TokensDTO tokensDTO = tokenUtil.generateTokens(sid, email, MemberRole.USER.name(), MemberSocial.GGL.name());
+                    TokensDTO tokensDTO = memberService.generateTokens(sid, email, MemberRole.USER.name(), MemberSocial.GGL.name());
 
                     response.setStatus(HttpServletResponse.SC_CREATED);
                     ResponseDTO responseDTO = new ResponseDTO(ResponseStatus.LOGIN_OK, "Login OK", tokensDTO);
@@ -113,7 +102,7 @@ public class ApiGoogleFilter extends OncePerRequestFilter {
 
                     if (new AntPathRequestMatcher("/api/google/member/signin").matches(request)) {
                         log.info("create tokens for existing user");
-                        TokensDTO tokensDTO = tokenUtil.generateTokens(memberDTO.getId(), email, memberDTO.getMemberRole().name(), MemberSocial.GGL.name());
+                        TokensDTO tokensDTO = memberService.generateTokens(memberDTO.getId(), email, memberDTO.getMemberRole().name(), MemberSocial.GGL.name());
 
                         response.setStatus(HttpServletResponse.SC_OK);
                         ResponseDTO responseDTO = new ResponseDTO(ResponseStatus.LOGIN_OK, "Login OK", tokensDTO);

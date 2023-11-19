@@ -10,8 +10,7 @@ import net.stockkid.stockkidbe.dto.ResponseStatus;
 import net.stockkid.stockkidbe.dto.TokensDTO;
 import net.stockkid.stockkidbe.entity.MemberSocial;
 import net.stockkid.stockkidbe.security.util.IoUtil;
-import net.stockkid.stockkidbe.security.util.TokenUtil;
-import org.springframework.beans.factory.annotation.Autowired;
+import net.stockkid.stockkidbe.service.MemberService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -23,14 +22,13 @@ import java.io.IOException;
 @Log4j2
 public class ApiLoginFilter extends AbstractAuthenticationProcessingFilter {
 
-    @Autowired
-    private TokenUtil tokenUtil;
+    private final IoUtil ioUtil;
+    private final MemberService memberService;
 
-    @Autowired
-    private IoUtil ioUtil;
-
-    public ApiLoginFilter(String defaultFilterProcessesUrl) {
+    public ApiLoginFilter(String defaultFilterProcessesUrl, IoUtil ioUtil, MemberService memberService) {
         super(defaultFilterProcessesUrl);
+        this.ioUtil = ioUtil;
+        this.memberService = memberService;
     }
 
     @Override
@@ -57,7 +55,7 @@ public class ApiLoginFilter extends AbstractAuthenticationProcessingFilter {
         String role = authResult.getAuthorities().iterator().next().getAuthority().substring(5);
 
         try {
-            TokensDTO tokensDTO = tokenUtil.generateTokens(null, username, role, MemberSocial.UP.name());
+            TokensDTO tokensDTO = memberService.generateTokens(null, username, role, MemberSocial.UP.name());
 
             response.setStatus(HttpServletResponse.SC_CREATED);
             ResponseDTO responseDTO = new ResponseDTO(ResponseStatus.LOGIN_OK, "Login OK", tokensDTO);

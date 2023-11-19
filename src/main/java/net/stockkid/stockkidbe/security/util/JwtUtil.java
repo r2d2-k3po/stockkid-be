@@ -13,10 +13,7 @@ import org.jose4j.keys.resolvers.HttpsJwksVerificationKeyResolver;
 import org.jose4j.lang.JoseException;
 import org.springframework.beans.factory.annotation.Value;
 
-import org.springframework.stereotype.Component;
-
 @Log4j2
-@Component
 public class JwtUtil {
 
     @Value("${jwk.json}")

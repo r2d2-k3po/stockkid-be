@@ -4,13 +4,13 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.stockkid.stockkidbe.dto.JWTClaimsDTO;
 import net.stockkid.stockkidbe.dto.ResponseDTO;
 import net.stockkid.stockkidbe.dto.ResponseStatus;
 import net.stockkid.stockkidbe.security.util.IoUtil;
 import net.stockkid.stockkidbe.security.util.JwtUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,19 +23,12 @@ import java.io.IOException;
 import java.util.Collections;
 
 @Log4j2
+@RequiredArgsConstructor
 public class ApiAccessFilter extends OncePerRequestFilter {
 
-    @Autowired
-    private JwtUtil jwtUtil;
-
-    @Autowired
-    private IoUtil ioUtil;
-
     private final AntPathRequestMatcher antPathRequestMatcher;
-
-    public ApiAccessFilter(AntPathRequestMatcher antPathRequestMatcher) {
-        this.antPathRequestMatcher = antPathRequestMatcher;
-    }
+    private final IoUtil ioUtil;
+    private final JwtUtil jwtUtil;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {

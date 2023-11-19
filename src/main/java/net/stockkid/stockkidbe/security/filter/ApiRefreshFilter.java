@@ -4,34 +4,25 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.stockkid.stockkidbe.dto.*;
 import net.stockkid.stockkidbe.security.util.IoUtil;
 import net.stockkid.stockkidbe.security.util.JwtUtil;
-import net.stockkid.stockkidbe.security.util.TokenUtil;
-import org.springframework.beans.factory.annotation.Autowired;
+import net.stockkid.stockkidbe.service.MemberService;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
 @Log4j2
+@RequiredArgsConstructor
 public class ApiRefreshFilter extends OncePerRequestFilter {
 
-    @Autowired
-    private JwtUtil jwtUtil;
-
-    @Autowired
-    private TokenUtil tokenUtil;
-
-    @Autowired
-    private IoUtil ioUtil;
-
     private final AntPathRequestMatcher antPathRequestMatcher;
-
-    public ApiRefreshFilter(AntPathRequestMatcher antPathRequestMatcher) {
-        this.antPathRequestMatcher = antPathRequestMatcher;
-    }
+    private final IoUtil ioUtil;
+    private final JwtUtil jwtUtil;
+    private final MemberService memberService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -47,14 +38,14 @@ public class ApiRefreshFilter extends OncePerRequestFilter {
                 JWTClaimsDTO jwtClaimsDTO = jwtUtil.verifyAndExtractToken(tokensDTO.getRefreshToken());
 
                 if (new AntPathRequestMatcher("/api/refresh/tokens").matches(request)) {
-                    TokensDTO newTokensDTO = tokenUtil.rotateTokens(jwtClaimsDTO.getUsername(), jwtClaimsDTO.getRole(), jwtClaimsDTO.getSocial(), tokensDTO.getRefreshToken());
+                    TokensDTO newTokensDTO = memberService.rotateTokens(jwtClaimsDTO.getUsername(), jwtClaimsDTO.getRole(), jwtClaimsDTO.getSocial(), tokensDTO.getRefreshToken());
 
                     response.setStatus(HttpServletResponse.SC_CREATED);
                     ResponseDTO responseDTO = new ResponseDTO(ResponseStatus.REFRESH_OK, "Refresh OK", newTokensDTO);
 
                     ioUtil.writeResponseBody(response, responseDTO);
                 } else if (new AntPathRequestMatcher("/api/refresh/logout").matches(request)) {
-                    tokenUtil.invalidateToken(jwtClaimsDTO.getUsername(), tokensDTO.getRefreshToken());
+                    memberService.invalidateToken(jwtClaimsDTO.getUsername(), tokensDTO.getRefreshToken());
 
                     response.setStatus(HttpServletResponse.SC_OK);
                     ResponseDTO responseDTO = new ResponseDTO();
