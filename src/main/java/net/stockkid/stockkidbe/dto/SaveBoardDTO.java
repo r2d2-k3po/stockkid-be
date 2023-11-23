@@ -5,7 +5,7 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @Data
-public class PostBoardDTO {
+public class SaveBoardDTO {
 
     private Long boardId;
     private String boardCategory;

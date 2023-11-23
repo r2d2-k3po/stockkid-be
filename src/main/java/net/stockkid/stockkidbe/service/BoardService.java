@@ -6,9 +6,9 @@ import net.stockkid.stockkidbe.entity.Reply;
 
 public interface BoardService {
 
-    void register(PostBoardDTO dto);
+    void register(SaveBoardDTO dto);
 
-    void modify(PostBoardDTO dto);
+    void modify(SaveBoardDTO dto);
 
     void delete(Long boardId);
 

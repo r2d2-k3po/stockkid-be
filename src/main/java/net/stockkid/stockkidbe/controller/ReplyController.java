@@ -3,7 +3,7 @@ package net.stockkid.stockkidbe.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.stockkid.stockkidbe.dto.LikeDTO;
-import net.stockkid.stockkidbe.dto.PostReplyDTO;
+import net.stockkid.stockkidbe.dto.SaveReplyDTO;
 import net.stockkid.stockkidbe.dto.ResponseDTO;
 import net.stockkid.stockkidbe.dto.ResponseStatus;
 import net.stockkid.stockkidbe.service.ReplyService;
@@ -24,7 +24,7 @@ public class ReplyController {
     private final ReplyService replyService;
 
     @PostMapping("/register")
-    public ResponseEntity<ResponseDTO> register(@RequestBody PostReplyDTO postReplyDTO) {
+    public ResponseEntity<ResponseDTO> register(@RequestBody SaveReplyDTO saveReplyDTO) {
 
         log.info("--------------reply register--------------");
 
@@ -33,7 +33,7 @@ public class ReplyController {
         httpHeaders.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
 
         try {
-            replyService.register(postReplyDTO);
+            replyService.register(saveReplyDTO);
             responseDTO.setApiStatus(ResponseStatus.WRITE_OK);
             responseDTO.setApiMsg("Write OK");
             return new ResponseEntity<>(responseDTO, httpHeaders, HttpStatus.OK);
@@ -46,7 +46,7 @@ public class ReplyController {
     }
 
     @PutMapping("/modify")
-    public ResponseEntity<ResponseDTO> modify(@RequestBody PostReplyDTO postReplyDTO) {
+    public ResponseEntity<ResponseDTO> modify(@RequestBody SaveReplyDTO saveReplyDTO) {
 
         log.info("--------------reply modify--------------");
 
@@ -55,7 +55,7 @@ public class ReplyController {
         httpHeaders.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
 
         try {
-            replyService.modify(postReplyDTO);
+            replyService.modify(saveReplyDTO);
             responseDTO.setApiStatus(ResponseStatus.WRITE_OK);
             responseDTO.setApiMsg("Write OK");
             return new ResponseEntity<>(responseDTO, httpHeaders, HttpStatus.OK);

@@ -5,7 +5,7 @@ import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
 @Data
-public class PostReplyDTO {
+public class SaveReplyDTO {
 
     private Long replyId;
     private Long boardId;

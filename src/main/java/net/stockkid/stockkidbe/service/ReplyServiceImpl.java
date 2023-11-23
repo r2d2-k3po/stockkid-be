@@ -4,7 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import net.stockkid.stockkidbe.dto.LikeDTO;
-import net.stockkid.stockkidbe.dto.PostReplyDTO;
+import net.stockkid.stockkidbe.dto.SaveReplyDTO;
 import net.stockkid.stockkidbe.entity.Board;
 import net.stockkid.stockkidbe.entity.MemberInfo;
 import net.stockkid.stockkidbe.entity.Reply;
@@ -29,7 +29,7 @@ public class ReplyServiceImpl implements ReplyService {
     private final MemberInfoRepository memberInfoRepository;
 
     @Override
-    public void register(PostReplyDTO dto) {
+    public void register(SaveReplyDTO dto) {
 
         Long memberId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         MemberInfo memberInfo = memberInfoRepository.getReferenceById(memberId);
@@ -54,7 +54,7 @@ public class ReplyServiceImpl implements ReplyService {
     }
 
     @Override
-    public void modify(PostReplyDTO dto) {
+    public void modify(SaveReplyDTO dto) {
 
         Long memberId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 

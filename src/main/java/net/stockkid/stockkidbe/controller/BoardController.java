@@ -22,7 +22,7 @@ public class BoardController {
     private final BoardService boardService;
 
     @PostMapping("/access/board/register")
-    public ResponseEntity<ResponseDTO> register(@RequestBody PostBoardDTO postBoardDTO) {
+    public ResponseEntity<ResponseDTO> register(@RequestBody SaveBoardDTO saveBoardDTO) {
 
         log.info("--------------board register--------------");
 
@@ -31,7 +31,7 @@ public class BoardController {
         httpHeaders.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
 
         try {
-            boardService.register(postBoardDTO);
+            boardService.register(saveBoardDTO);
             responseDTO.setApiStatus(ResponseStatus.WRITE_OK);
             responseDTO.setApiMsg("Write OK");
             return new ResponseEntity<>(responseDTO, httpHeaders, HttpStatus.OK);
@@ -44,7 +44,7 @@ public class BoardController {
     }
 
     @PutMapping("/access/board/modify")
-    public ResponseEntity<ResponseDTO> modify(@RequestBody PostBoardDTO postBoardDTO) {
+    public ResponseEntity<ResponseDTO> modify(@RequestBody SaveBoardDTO saveBoardDTO) {
 
         log.info("--------------board modify--------------");
 
@@ -53,7 +53,7 @@ public class BoardController {
         httpHeaders.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
 
         try {
-            boardService.modify(postBoardDTO);
+            boardService.modify(saveBoardDTO);
             responseDTO.setApiStatus(ResponseStatus.WRITE_OK);
             responseDTO.setApiMsg("Write OK");
             return new ResponseEntity<>(responseDTO, httpHeaders, HttpStatus.OK);

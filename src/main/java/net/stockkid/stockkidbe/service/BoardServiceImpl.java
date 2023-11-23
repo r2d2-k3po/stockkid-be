@@ -6,7 +6,7 @@ import lombok.extern.log4j.Log4j2;
 import net.stockkid.stockkidbe.dto.BoardPageDTO;
 import net.stockkid.stockkidbe.dto.BoardReplyDTO;
 import net.stockkid.stockkidbe.dto.LikeDTO;
-import net.stockkid.stockkidbe.dto.PostBoardDTO;
+import net.stockkid.stockkidbe.dto.SaveBoardDTO;
 import net.stockkid.stockkidbe.entity.Board;
 import net.stockkid.stockkidbe.entity.BoardCategory;
 import net.stockkid.stockkidbe.entity.MemberInfo;
@@ -37,7 +37,7 @@ public class BoardServiceImpl implements BoardService{
 
     // USER
     @Override
-    public void register(PostBoardDTO dto) {
+    public void register(SaveBoardDTO dto) {
 
         Long memberId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         MemberInfo memberInfo = memberInfoRepository.getReferenceById(memberId);
@@ -59,7 +59,7 @@ public class BoardServiceImpl implements BoardService{
     }
 
     @Override
-    public void modify(PostBoardDTO dto) {
+    public void modify(SaveBoardDTO dto) {
 
         Long memberId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
