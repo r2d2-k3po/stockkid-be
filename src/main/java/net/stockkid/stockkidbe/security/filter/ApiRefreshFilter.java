@@ -38,14 +38,14 @@ public class ApiRefreshFilter extends OncePerRequestFilter {
                 JWTClaimsDTO jwtClaimsDTO = jwtUtil.verifyAndExtractToken(tokensDTO.getRefreshToken());
 
                 if (new AntPathRequestMatcher("/api/refresh/tokens").matches(request)) {
-                    TokensDTO newTokensDTO = memberService.rotateTokens(jwtClaimsDTO.getUsername(), jwtClaimsDTO.getRole(), jwtClaimsDTO.getSocial(), tokensDTO.getRefreshToken());
+                    TokensDTO newTokensDTO = memberService.rotateTokens(jwtClaimsDTO.getMemberId(), jwtClaimsDTO.getRole(), jwtClaimsDTO.getSocial(), tokensDTO.getRefreshToken());
 
                     response.setStatus(HttpServletResponse.SC_CREATED);
                     ResponseDTO responseDTO = new ResponseDTO(ResponseStatus.REFRESH_OK, "Refresh OK", newTokensDTO);
 
                     ioUtil.writeResponseBody(response, responseDTO);
                 } else if (new AntPathRequestMatcher("/api/refresh/logout").matches(request)) {
-                    memberService.invalidateToken(jwtClaimsDTO.getUsername(), tokensDTO.getRefreshToken());
+                    memberService.invalidateToken(jwtClaimsDTO.getMemberId(), tokensDTO.getRefreshToken());
 
                     response.setStatus(HttpServletResponse.SC_OK);
                     ResponseDTO responseDTO = new ResponseDTO();

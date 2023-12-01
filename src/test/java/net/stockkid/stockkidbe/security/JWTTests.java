@@ -27,7 +27,7 @@ public class JWTTests {
         String role = "USER";
         String social = "UP";
 
-        String token = jwtUtil.generateRefreshToken(username, role, social);
+        String token = jwtUtil.generateRefreshToken(1L, username, role, social);
 
         System.out.println("token : " + token);
     }
@@ -38,7 +38,7 @@ public class JWTTests {
         String username = "jwtTestUser";
         String role = "USER";
         String social = "UP";
-        String token = jwtUtil.generateRefreshToken(username, role, social);
+        String token = jwtUtil.generateRefreshToken(1L, username, role, social);
 
         Thread.sleep(5000);
 

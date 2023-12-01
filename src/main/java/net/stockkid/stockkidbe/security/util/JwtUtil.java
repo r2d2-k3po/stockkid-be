@@ -70,12 +70,13 @@ public class JwtUtil {
         return jws.getCompactSerialization();
     }
 
-    public String generateRefreshToken(String sub, String rol, String soc) throws Exception {
+    public String generateRefreshToken(Long sid, String sub, String rol, String soc) throws Exception {
 
         long sevenDaysInMinutes = 7 * 24 * 60;
         RsaJsonWebKey rsaJsonWebKey = getJwkFromProperties();
 
         JwtClaims claims = new JwtClaims();
+        claims.setClaim("sid", sid);
         claims.setSubject(sub);
         claims.setStringClaim("rol", rol);
         claims.setStringClaim("soc", soc);

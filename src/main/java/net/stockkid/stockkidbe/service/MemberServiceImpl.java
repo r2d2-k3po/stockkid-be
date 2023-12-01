@@ -183,26 +183,26 @@ public class MemberServiceImpl implements MemberService {
             existingUser = optionalUser.orElseThrow(() -> new IllegalArgumentException("memberId not found"));
         }
 
-        return generateTokensDTO(existingUser, sub, rol, soc);
+        return generateTokensDTO(existingUser, rol, soc);
     }
 
-    public TokensDTO rotateTokens(String sub, String rol, String soc, String refreshToken) throws Exception {
+    public TokensDTO rotateTokens(Long sid, String rol, String soc, String refreshToken) throws Exception {
 
-        Optional<Member> optionalUser = memberRepository.findByUsername(sub);
-        Member existingUser = optionalUser.orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        Optional<Member> optionalUser = memberRepository.findById(sid);
+        Member existingUser = optionalUser.orElseThrow(() -> new IllegalArgumentException("memberId not found"));
 
         if (Objects.equals(refreshToken, existingUser.getRefreshToken())) {
-            return generateTokensDTO(existingUser, sub, rol, soc);
+            return generateTokensDTO(existingUser, rol, soc);
         } else {
             throw new Exception("refreshToken not valid");
         }
     }
 
-    private TokensDTO generateTokensDTO(Member existingUser, String sub, String rol, String soc) throws Exception {
+    private TokensDTO generateTokensDTO(Member existingUser, String rol, String soc) throws Exception {
 
         TokensDTO tokensDTO = new TokensDTO();
         tokensDTO.setAccessToken(jwtUtil.generateAccessToken(existingUser.getId(), rol));
-        tokensDTO.setRefreshToken(jwtUtil.generateRefreshToken(sub, rol, soc));
+        tokensDTO.setRefreshToken(jwtUtil.generateRefreshToken(existingUser.getId(), existingUser.getUsername(), rol, soc));
 
         log.info("successful accessToken : " + tokensDTO.getAccessToken());
         log.info("successful refreshToken : " + tokensDTO.getRefreshToken());
@@ -213,10 +213,10 @@ public class MemberServiceImpl implements MemberService {
         return tokensDTO;
     }
 
-    public void invalidateToken(String sub, String refreshToken) throws Exception {
+    public void invalidateToken(Long sid, String refreshToken) throws Exception {
 
-        Optional<Member> optionalUser = memberRepository.findByUsername(sub);
-        Member existingUser = optionalUser.orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        Optional<Member> optionalUser = memberRepository.findById(sid);
+        Member existingUser = optionalUser.orElseThrow(() -> new IllegalArgumentException("memberId not found"));
 
         if (Objects.equals(refreshToken, existingUser.getRefreshToken())) {
             existingUser.setRefreshToken(null);
