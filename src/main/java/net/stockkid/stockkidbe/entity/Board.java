@@ -33,6 +33,7 @@ public class Board extends BaseEntity {
 
     private @Setter String title;
 
+    @Column(length = 1024)
     @NotNull
     @ToString.Exclude
     private @Setter String preview;

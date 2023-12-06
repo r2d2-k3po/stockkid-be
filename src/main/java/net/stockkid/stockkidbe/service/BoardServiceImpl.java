@@ -48,9 +48,9 @@ public class BoardServiceImpl implements BoardService{
         board.setTitle(dto.getTitle());
         board.setPreview(dto.getPreview());
         board.setContent(dto.getContent());
-        board.setTag1(dto.getTag1().toLowerCase());
-        board.setTag2(dto.getTag2().toLowerCase());
-        board.setTag3(dto.getTag3().toLowerCase());
+        board.setTag1(dto.getTag1() != null ? dto.getTag1().toLowerCase() : null);
+        board.setTag2(dto.getTag2() != null ? dto.getTag2().toLowerCase() : null);
+        board.setTag3(dto.getTag3() != null ? dto.getTag3().toLowerCase() : null);
         board.setMemberInfo(memberInfo);
 
         memberInfo.getBoardList().add(board);
@@ -72,9 +72,9 @@ public class BoardServiceImpl implements BoardService{
             existingBoard.setTitle(dto.getTitle());
             existingBoard.setPreview(dto.getPreview());
             existingBoard.setContent(dto.getContent());
-            existingBoard.setTag1(dto.getTag1().toLowerCase());
-            existingBoard.setTag2(dto.getTag2().toLowerCase());
-            existingBoard.setTag3(dto.getTag3().toLowerCase());
+            existingBoard.setTag1(dto.getTag1() != null ? dto.getTag1().toLowerCase() : null);
+            existingBoard.setTag2(dto.getTag2() != null ? dto.getTag2().toLowerCase() : null);
+            existingBoard.setTag3(dto.getTag3() != null ? dto.getTag3().toLowerCase() : null);
 
             boardRepository.save(existingBoard);
         } else throw new IllegalArgumentException("memberId not match");
