@@ -31,9 +31,10 @@ public class BoardController {
         httpHeaders.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
 
         try {
-            boardService.register(saveBoardDTO);
+            IdDTO idDTO = boardService.register(saveBoardDTO);
             responseDTO.setApiStatus(ResponseStatus.WRITE_OK);
             responseDTO.setApiMsg("Write OK");
+            responseDTO.setApiObj(idDTO);
             return new ResponseEntity<>(responseDTO, httpHeaders, HttpStatus.OK);
         } catch (Exception e) {
             log.info("Write Error : " + e.getMessage());

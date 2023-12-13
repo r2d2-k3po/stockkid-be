@@ -2,9 +2,7 @@ package net.stockkid.stockkidbe.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import net.stockkid.stockkidbe.dto.LikeDTO;
-import net.stockkid.stockkidbe.dto.SaveReplyDTO;
-import net.stockkid.stockkidbe.dto.ResponseDTO;
+import net.stockkid.stockkidbe.dto.*;
 import net.stockkid.stockkidbe.dto.ResponseStatus;
 import net.stockkid.stockkidbe.service.ReplyService;
 import org.springframework.http.HttpHeaders;
@@ -33,9 +31,10 @@ public class ReplyController {
         httpHeaders.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
 
         try {
-            replyService.register(saveReplyDTO);
+            IdDTO idDTO = replyService.register(saveReplyDTO);
             responseDTO.setApiStatus(ResponseStatus.WRITE_OK);
             responseDTO.setApiMsg("Write OK");
+            responseDTO.setApiObj(idDTO);
             return new ResponseEntity<>(responseDTO, httpHeaders, HttpStatus.OK);
         } catch (Exception e) {
             log.info("Write Error : " + e.getMessage());

@@ -6,7 +6,7 @@ import net.stockkid.stockkidbe.entity.Reply;
 
 public interface BoardService {
 
-    void register(SaveBoardDTO dto);
+    IdDTO register(SaveBoardDTO dto);
 
     void modify(SaveBoardDTO dto);
 

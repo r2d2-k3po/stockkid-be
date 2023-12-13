@@ -3,10 +3,7 @@ package net.stockkid.stockkidbe.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import net.stockkid.stockkidbe.dto.BoardPageDTO;
-import net.stockkid.stockkidbe.dto.BoardReplyDTO;
-import net.stockkid.stockkidbe.dto.LikeDTO;
-import net.stockkid.stockkidbe.dto.SaveBoardDTO;
+import net.stockkid.stockkidbe.dto.*;
 import net.stockkid.stockkidbe.entity.Board;
 import net.stockkid.stockkidbe.entity.BoardCategory;
 import net.stockkid.stockkidbe.entity.MemberInfo;
@@ -37,7 +34,7 @@ public class BoardServiceImpl implements BoardService{
 
     // USER
     @Override
-    public void register(SaveBoardDTO dto) {
+    public IdDTO register(SaveBoardDTO dto) {
 
         Long memberId = (Long) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         MemberInfo memberInfo = memberInfoRepository.getReferenceById(memberId);
@@ -54,8 +51,9 @@ public class BoardServiceImpl implements BoardService{
         board.setMemberInfo(memberInfo);
 
         memberInfo.getBoardList().add(board);
-
         boardRepository.save(board);
+
+        return new IdDTO(board.getId());
     }
 
     @Override
@@ -91,7 +89,7 @@ public class BoardServiceImpl implements BoardService{
         if (Objects.equals(existingBoard.getMemberInfo().getMemberId(), memberId)) {
             existingBoard.setTitle("deleted");
             existingBoard.setPreview("deleted");
-            existingBoard.setContent("deleted");
+            existingBoard.setContent("{\"type\":\"doc\",\"content\":[{\"type\":\"paragraph\",\"attrs\":{\"dir\":null,\"ignoreBidiAutoUpdate\":null},\"content\":[{\"type\":\"text\",\"text\":\"deleted\"}]}]}");
 
             boardRepository.save(existingBoard);
         } else throw new IllegalArgumentException("memberId not match");
