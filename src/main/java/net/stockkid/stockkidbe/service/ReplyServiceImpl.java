@@ -80,7 +80,7 @@ public class ReplyServiceImpl implements ReplyService {
         Reply existingReply = optionalReply.orElseThrow(() -> new IllegalArgumentException("replyId not found"));
 
         if (Objects.equals(existingReply.getMemberInfo().getMemberId(), memberId)) {
-            existingReply.setContent("deleted");
+            existingReply.setContent("{\"type\":\"doc\",\"content\":[{\"type\":\"paragraph\",\"attrs\":{\"dir\":null,\"ignoreBidiAutoUpdate\":null},\"content\":[{\"type\":\"text\",\"text\":\"deleted\"}]}]}");
 
             replyRepository.save(existingReply);
         } else throw new IllegalArgumentException("memberId not match");
