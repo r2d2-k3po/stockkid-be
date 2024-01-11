@@ -12,6 +12,7 @@ import net.stockkid.stockkidbe.entity.Reply;
 import net.stockkid.stockkidbe.repository.BoardRepository;
 import net.stockkid.stockkidbe.repository.MemberInfoRepository;
 import net.stockkid.stockkidbe.repository.ReplyRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +25,9 @@ import java.util.Set;
 @RequiredArgsConstructor
 @Transactional
 public class ReplyServiceImpl implements ReplyService {
+
+    @Value("${deletedContent}")
+    private String deletedContent;
 
     private final ReplyRepository replyRepository;
     private final BoardRepository boardRepository;
@@ -80,7 +84,7 @@ public class ReplyServiceImpl implements ReplyService {
         Reply existingReply = optionalReply.orElseThrow(() -> new IllegalArgumentException("replyId not found"));
 
         if (Objects.equals(existingReply.getMemberInfo().getMemberId(), memberId)) {
-            existingReply.setContent("{\"type\":\"doc\",\"content\":[{\"type\":\"paragraph\",\"attrs\":{\"dir\":null,\"ignoreBidiAutoUpdate\":null},\"content\":[{\"type\":\"text\",\"text\":\"deleted\"}]}]}");
+            existingReply.setContent(deletedContent);
 
             replyRepository.save(existingReply);
         } else throw new IllegalArgumentException("memberId not match");

@@ -19,15 +19,21 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional
-        ;
+import java.util.Optional;
 import java.util.Set;
+import org.springframework.beans.factory.annotation.Value;
 
 @Log4j2
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class BoardServiceImpl implements BoardService{
+
+    @Value("${deletedString}")
+    private String deletedString;
+
+    @Value("${deletedContent}")
+    private String deletedContent;
 
     private final BoardRepository boardRepository;
     private final MemberInfoRepository memberInfoRepository;
@@ -87,9 +93,9 @@ public class BoardServiceImpl implements BoardService{
         Board existingBoard = optionalBoard.orElseThrow(() -> new IllegalArgumentException("boardId not found"));
 
         if (Objects.equals(existingBoard.getMemberInfo().getMemberId(), memberId)) {
-            existingBoard.setTitle("deleted");
-            existingBoard.setPreview("deleted");
-            existingBoard.setContent("{\"type\":\"doc\",\"content\":[{\"type\":\"paragraph\",\"attrs\":{\"dir\":null,\"ignoreBidiAutoUpdate\":null},\"content\":[{\"type\":\"text\",\"text\":\"deleted\"}]}]}");
+            existingBoard.setTitle(deletedString);
+            existingBoard.setPreview(deletedString);
+            existingBoard.setContent(deletedContent);
 
             boardRepository.save(existingBoard);
         } else throw new IllegalArgumentException("memberId not match");
