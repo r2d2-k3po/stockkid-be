@@ -4,6 +4,8 @@ import net.stockkid.stockkidbe.dto.*;
 import net.stockkid.stockkidbe.entity.Board;
 import net.stockkid.stockkidbe.entity.Reply;
 
+import java.nio.charset.StandardCharsets;
+
 public interface BoardService {
 
     IdDTO register(SaveBoardDTO dto);
@@ -41,7 +43,7 @@ public interface BoardService {
 
     default BoardDTO entityToDto(Board entity) {
         BoardDTO boardDTO = entityToPreviewDto(entity);
-        boardDTO.setContent(entity.getContent());
+        boardDTO.setContent(new String(entity.getContent(), StandardCharsets.UTF_8));
 
         return boardDTO;
     }
@@ -52,7 +54,7 @@ public interface BoardService {
                 .parentId(reply.getParentId())
                 .memberId(reply.getMemberInfo().getMemberId())
                 .nickname(reply.getNickname())
-                .content(reply.getContent())
+                .content(new String(reply.getContent(), StandardCharsets.UTF_8))
                 .likeCount(reply.getLikeCount())
                 .regDate(reply.getRegDate())
                 .modDate(reply.getModDate())

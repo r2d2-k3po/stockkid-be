@@ -4,8 +4,6 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
-import static org.hibernate.Length.LONG;
-
 @Entity
 @ToString
 @Getter
@@ -22,10 +20,11 @@ public class Reply extends BaseEntity{
     @NotNull
     private @Setter String nickname;
 
-    @Column(length = LONG)
+    @Column(length = 2000000)
     @NotNull
     @ToString.Exclude
-    private @Setter String content;
+    @Lob
+    private @Setter byte[] content;
 
     @NotNull
     private @Setter int likeCount = 0;

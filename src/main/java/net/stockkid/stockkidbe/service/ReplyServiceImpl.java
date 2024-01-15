@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -45,7 +46,7 @@ public class ReplyServiceImpl implements ReplyService {
         Reply reply = new Reply();
         reply.setParentId(dto.getParentId());
         reply.setNickname(dto.getNickname());
-        reply.setContent(dto.getContent());
+        reply.setContent(dto.getContent().getBytes(StandardCharsets.UTF_8));
         reply.setMemberInfo(memberInfo);
         reply.setBoard(existingBoard);
 
@@ -69,7 +70,7 @@ public class ReplyServiceImpl implements ReplyService {
 
         if (Objects.equals(existingReply.getMemberInfo().getMemberId(), memberId)) {
             existingReply.setNickname(dto.getNickname());
-            existingReply.setContent(dto.getContent());
+            existingReply.setContent(dto.getContent().getBytes(StandardCharsets.UTF_8));
 
             replyRepository.save(existingReply);
         } else throw new IllegalArgumentException("memberId not match");
@@ -84,7 +85,7 @@ public class ReplyServiceImpl implements ReplyService {
         Reply existingReply = optionalReply.orElseThrow(() -> new IllegalArgumentException("replyId not found"));
 
         if (Objects.equals(existingReply.getMemberInfo().getMemberId(), memberId)) {
-            existingReply.setContent(deletedContent);
+            existingReply.setContent(deletedContent.getBytes(StandardCharsets.UTF_8));
 
             replyRepository.save(existingReply);
         } else throw new IllegalArgumentException("memberId not match");

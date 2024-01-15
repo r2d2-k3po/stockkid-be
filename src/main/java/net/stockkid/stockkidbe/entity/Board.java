@@ -7,8 +7,6 @@ import lombok.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.hibernate.Length.LONG;
-
 @Entity
 @ToString
 @Getter
@@ -38,11 +36,12 @@ public class Board extends BaseEntity {
     @ToString.Exclude
     private @Setter String preview;
 
-    @Column(length = LONG)
+    @Column(length = 2000000)
     @NotNull
     @ToString.Exclude
+    @Lob
     @Basic(fetch = FetchType.LAZY)
-    private @Setter String content;
+    private @Setter byte[] content;
 
     private @Setter String tag1;
 

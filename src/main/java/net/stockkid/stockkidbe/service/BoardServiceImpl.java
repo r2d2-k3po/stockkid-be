@@ -17,6 +17,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -50,7 +51,7 @@ public class BoardServiceImpl implements BoardService{
         board.setNickname(dto.getNickname());
         board.setTitle(dto.getTitle());
         board.setPreview(dto.getPreview());
-        board.setContent(dto.getContent());
+        board.setContent(dto.getContent().getBytes(StandardCharsets.UTF_8));
         board.setTag1(dto.getTag1() != null ? dto.getTag1().toLowerCase() : null);
         board.setTag2(dto.getTag2() != null ? dto.getTag2().toLowerCase() : null);
         board.setTag3(dto.getTag3() != null ? dto.getTag3().toLowerCase() : null);
@@ -75,7 +76,7 @@ public class BoardServiceImpl implements BoardService{
             existingBoard.setNickname(dto.getNickname());
             existingBoard.setTitle(dto.getTitle());
             existingBoard.setPreview(dto.getPreview());
-            existingBoard.setContent(dto.getContent());
+            existingBoard.setContent(dto.getContent().getBytes(StandardCharsets.UTF_8));
             existingBoard.setTag1(dto.getTag1() != null ? dto.getTag1().toLowerCase() : null);
             existingBoard.setTag2(dto.getTag2() != null ? dto.getTag2().toLowerCase() : null);
             existingBoard.setTag3(dto.getTag3() != null ? dto.getTag3().toLowerCase() : null);
@@ -95,7 +96,7 @@ public class BoardServiceImpl implements BoardService{
         if (Objects.equals(existingBoard.getMemberInfo().getMemberId(), memberId)) {
             existingBoard.setTitle(deletedString);
             existingBoard.setPreview(deletedString);
-            existingBoard.setContent(deletedContent);
+            existingBoard.setContent(deletedContent.getBytes(StandardCharsets.UTF_8));
 
             boardRepository.save(existingBoard);
         } else throw new IllegalArgumentException("memberId not match");
