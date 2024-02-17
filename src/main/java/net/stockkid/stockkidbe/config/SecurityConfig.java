@@ -54,8 +54,8 @@ public class SecurityConfig {
         http
                 .cors(withDefaults())
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("/api/permit/**").permitAll()
-                        .requestMatchers("/api/access/**").hasRole("USER")
+                        .requestMatchers("/permit/**").permitAll()
+                        .requestMatchers("/access/**").hasRole("USER")
                         .anyRequest().denyAll()
                 )
                 .addFilterBefore(apiAccessFilter(), UsernamePasswordAuthenticationFilter.class)
@@ -95,7 +95,7 @@ public class SecurityConfig {
     @Bean
     public ApiLoginFilter apiLoginFilter() {
 
-        ApiLoginFilter apiLoginFilter = new ApiLoginFilter("/api/login", ioUtil(), memberService());
+        ApiLoginFilter apiLoginFilter = new ApiLoginFilter("/login", ioUtil(), memberService());
         apiLoginFilter.setAuthenticationManager(authenticationManager());
         apiLoginFilter.setAuthenticationFailureHandler(new ApiLoginFailureHandler());
 
@@ -104,27 +104,27 @@ public class SecurityConfig {
 
     @Bean
     public ApiAccessFilter apiAccessFilter() {
-        return new ApiAccessFilter(new AntPathRequestMatcher("/api/access/**"), ioUtil(), jwtUtil());
+        return new ApiAccessFilter(new AntPathRequestMatcher("/access/**"), ioUtil(), jwtUtil());
     }
 
     @Bean
     public ApiRefreshFilter apiRefreshFilter() {
-        return new ApiRefreshFilter(new AntPathRequestMatcher("/api/refresh/**"), ioUtil(), jwtUtil(), memberService());
+        return new ApiRefreshFilter(new AntPathRequestMatcher("/refresh/**"), ioUtil(), jwtUtil(), memberService());
     }
 
     @Bean
     public ApiGoogleFilter apiGoogleFilter() {
-        return new ApiGoogleFilter(new AntPathRequestMatcher("/api/google/**"), ioUtil(), memberService());
+        return new ApiGoogleFilter(new AntPathRequestMatcher("/google/**"), ioUtil(), memberService());
     }
 
     @Bean
     public ApiNaverFilter apiNaverFilter() {
-        return new ApiNaverFilter(new AntPathRequestMatcher("/api/naver/**"), ioUtil(), memberService());
+        return new ApiNaverFilter(new AntPathRequestMatcher("/naver/**"), ioUtil(), memberService());
     }
 
     @Bean
     public ApiKakaoFilter apiKakaoFilter() {
-        return new ApiKakaoFilter(new AntPathRequestMatcher("/api/kakao/**"), ioUtil(), jwtUtil(), memberService());
+        return new ApiKakaoFilter(new AntPathRequestMatcher("/kakao/**"), ioUtil(), jwtUtil(), memberService());
     }
 
     @Bean

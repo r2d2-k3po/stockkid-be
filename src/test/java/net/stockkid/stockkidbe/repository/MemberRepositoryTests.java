@@ -27,30 +27,30 @@ public class MemberRepositoryTests {
         System.out.println(hierarchy);
     }
 
-    @Test
-    public void insertMember() {
-        IntStream.rangeClosed(1,20).forEach(i -> {
-            Member member = Member.builder()
-                    .username("user"+i)
-                    .password(passwordEncoder.encode("user"+i))
-                    .memberRole(MemberRole.USER)
-                    .accountNonExpired(true)
-                    .accountNonLocked(true)
-                    .credentialsNonExpired(true)
-                    .enabled(true)
-                    .memberSocial(MemberSocial.UP)
-                    .build();
-            memberRepository.save(member);
-        });
-    }
+//    @Test
+//    public void insertMember() {
+//        IntStream.rangeClosed(1,20).forEach(i -> {
+//            Member member = Member.builder()
+//                    .username("user"+i)
+//                    .password(passwordEncoder.encode("user"+i))
+//                    .memberRole(MemberRole.USER)
+//                    .accountNonExpired(true)
+//                    .accountNonLocked(true)
+//                    .credentialsNonExpired(true)
+//                    .enabled(true)
+//                    .memberSocial(MemberSocial.UP)
+//                    .build();
+//            memberRepository.save(member);
+//        });
+//    }
 
-    @Test
-    public void testRead() {
-        Optional<Member> result = memberRepository.findById(1L);
-
-        Member member = result.get();
-        System.out.println(member);
-        System.out.println(member.getMemberSettings());
+//    @Test
+//    public void testRead() {
+//        Optional<Member> result = memberRepository.findById(1L);
+//
+//        Member member = result.get();
+//        System.out.println(member);
 //        System.out.println(member.getMemberSettings());
-    }
+////        System.out.println(member.getMemberSettings());
+//    }
 }

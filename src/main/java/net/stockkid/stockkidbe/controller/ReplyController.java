@@ -15,7 +15,7 @@ import java.nio.charset.StandardCharsets;
 
 @RestController
 @Log4j2
-@RequestMapping("/api/access/reply")
+@RequestMapping("/access/reply")
 @RequiredArgsConstructor
 public class ReplyController {
 

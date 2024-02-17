@@ -68,7 +68,7 @@ public class ApiNaverFilter  extends OncePerRequestFilter {
                     if (!memberDTO.isCredentialsNonExpired()) throw new Exception("Credential expired");
                     if (!memberDTO.isAccountNonLocked()) throw new Exception("Account locked");
 
-                    if (new AntPathRequestMatcher("/api/naver/member/signin").matches(request)) {
+                    if (new AntPathRequestMatcher("/naver/member/signin").matches(request)) {
                         log.info("create tokens for existing user");
                         TokensDTO tokensDTO = memberService.generateTokens(memberDTO.getId(), email, memberDTO.getMemberRole().name(), MemberSocial.NAV.name());
 
@@ -76,7 +76,7 @@ public class ApiNaverFilter  extends OncePerRequestFilter {
                         ResponseDTO responseDTO = new ResponseDTO(ResponseStatus.LOGIN_OK, "Login OK", tokensDTO);
 
                         ioUtil.writeResponseBody(response, responseDTO);
-                    } else if (new AntPathRequestMatcher("/api/naver/member/deleteAccount").matches(request)) {
+                    } else if (new AntPathRequestMatcher("/naver/member/deleteAccount").matches(request)) {
                         log.info("disable existing Naver user");
                         memberDTO.setEnabled(false);
                         memberService.disableSocialUser(memberDTO.getId());
@@ -99,9 +99,9 @@ public class ApiNaverFilter  extends OncePerRequestFilter {
                 response.setStatus(HttpServletResponse.SC_CONFLICT);
 
                 ResponseDTO responseDTO = new ResponseDTO();
-                if (new AntPathRequestMatcher("/api/naver/member/signin").matches(request)) {
+                if (new AntPathRequestMatcher("/naver/member/signin").matches(request)) {
                     responseDTO.setApiStatus(ResponseStatus.LOGIN_FAIL);
-                } else if (new AntPathRequestMatcher("/api/naver/member/deleteAccount").matches(request)) {
+                } else if (new AntPathRequestMatcher("/naver/member/deleteAccount").matches(request)) {
                     responseDTO.setApiStatus(ResponseStatus.AC_DL_FAIL);
                 }
                 responseDTO.setApiMsg(error.getMessage());

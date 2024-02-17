@@ -37,14 +37,14 @@ public class ApiRefreshFilter extends OncePerRequestFilter {
 
                 JWTClaimsDTO jwtClaimsDTO = jwtUtil.verifyAndExtractToken(tokensDTO.getRefreshToken());
 
-                if (new AntPathRequestMatcher("/api/refresh/tokens").matches(request)) {
+                if (new AntPathRequestMatcher("/refresh/tokens").matches(request)) {
                     TokensDTO newTokensDTO = memberService.rotateTokens(jwtClaimsDTO.getMemberId(), jwtClaimsDTO.getRole(), jwtClaimsDTO.getSocial(), tokensDTO.getRefreshToken());
 
                     response.setStatus(HttpServletResponse.SC_CREATED);
                     ResponseDTO responseDTO = new ResponseDTO(ResponseStatus.REFRESH_OK, "Refresh OK", newTokensDTO);
 
                     ioUtil.writeResponseBody(response, responseDTO);
-                } else if (new AntPathRequestMatcher("/api/refresh/logout").matches(request)) {
+                } else if (new AntPathRequestMatcher("/refresh/logout").matches(request)) {
                     memberService.invalidateToken(jwtClaimsDTO.getMemberId(), tokensDTO.getRefreshToken());
 
                     response.setStatus(HttpServletResponse.SC_OK);
@@ -59,10 +59,10 @@ public class ApiRefreshFilter extends OncePerRequestFilter {
                 log.info(e.getMessage());
 
                 ResponseDTO responseDTO = new ResponseDTO();
-                if (new AntPathRequestMatcher("/api/refresh/tokens").matches(request)) {
+                if (new AntPathRequestMatcher("/refresh/tokens").matches(request)) {
                     response.setStatus(HttpServletResponse.SC_OK);
                     responseDTO.setApiStatus(ResponseStatus.REFRESH_FAIL);
-                } else if (new AntPathRequestMatcher("/api/refresh/logout").matches(request)) {
+                } else if (new AntPathRequestMatcher("/refresh/logout").matches(request)) {
                     response.setStatus(HttpServletResponse.SC_CONFLICT);
                     responseDTO.setApiStatus(ResponseStatus.LOGOUT_FAIL);
                 }

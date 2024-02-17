@@ -68,7 +68,7 @@ public class ApiKakaoFilter extends OncePerRequestFilter {
                     if (!memberDTO.isCredentialsNonExpired()) throw new Exception("Credential expired");
                     if (!memberDTO.isAccountNonLocked()) throw new Exception("Account locked");
 
-                    if (new AntPathRequestMatcher("/api/kakao/member/signin").matches(request)) {
+                    if (new AntPathRequestMatcher("/kakao/member/signin").matches(request)) {
                         log.info("create tokens for existing user");
                         TokensDTO tokensDTO = memberService.generateTokens(memberDTO.getId(), email, memberDTO.getMemberRole().name(), MemberSocial.KKO.name());
 
@@ -76,7 +76,7 @@ public class ApiKakaoFilter extends OncePerRequestFilter {
                         ResponseDTO responseDTO = new ResponseDTO(ResponseStatus.LOGIN_OK, "Login OK", tokensDTO);
 
                         ioUtil.writeResponseBody(response, responseDTO);
-                    } else if (new AntPathRequestMatcher("/api/kakao/member/deleteAccount").matches(request)) {
+                    } else if (new AntPathRequestMatcher("/kakao/member/deleteAccount").matches(request)) {
                         log.info("disable existing Kakao user");
                         memberDTO.setEnabled(false);
                         memberService.disableSocialUser(memberDTO.getId());
@@ -99,9 +99,9 @@ public class ApiKakaoFilter extends OncePerRequestFilter {
                 response.setStatus(HttpServletResponse.SC_CONFLICT);
 
                 ResponseDTO responseDTO = new ResponseDTO();
-                if (new AntPathRequestMatcher("/api/kakao/member/signin").matches(request)) {
+                if (new AntPathRequestMatcher("/kakao/member/signin").matches(request)) {
                     responseDTO.setApiStatus(ResponseStatus.LOGIN_FAIL);
-                } else if (new AntPathRequestMatcher("/api/kakao/member/deleteAccount").matches(request)) {
+                } else if (new AntPathRequestMatcher("/kakao/member/deleteAccount").matches(request)) {
                     responseDTO.setApiStatus(ResponseStatus.AC_DL_FAIL);
                 }
                 responseDTO.setApiMsg(error.getMessage());

@@ -17,7 +17,6 @@ import java.util.regex.Pattern;
 
 @RestController
 @Log4j2
-@RequestMapping("/api")
 @RequiredArgsConstructor
 public class MemberController {
 

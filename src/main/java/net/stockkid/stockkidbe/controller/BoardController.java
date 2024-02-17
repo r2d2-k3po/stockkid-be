@@ -15,7 +15,6 @@ import java.nio.charset.StandardCharsets;
 
 @RestController
 @Log4j2
-@RequestMapping("/api")
 @RequiredArgsConstructor
 public class BoardController {
 
