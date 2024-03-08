@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -48,6 +49,9 @@ public class BoardServiceImpl implements BoardService{
 
         Board board = new Board();
         board.setBoardCategory(BoardCategory.valueOf(dto.getBoardCategory()));
+
+        if (board.getBoardCategory() == BoardCategory.NOTICE && SecurityContextHolder.getContext().getAuthentication().getAuthorities().iterator().next().getAuthority().equals("ROLE_USER")) throw new AccessDeniedException("User does not have proper authority.");
+
         board.setNickname(dto.getNickname());
         board.setTitle(dto.getTitle());
         board.setPreview(dto.getPreview());
@@ -73,6 +77,9 @@ public class BoardServiceImpl implements BoardService{
 
         if (Objects.equals(existingBoard.getMemberInfo().getMemberId(), memberId)) {
             existingBoard.setBoardCategory(BoardCategory.valueOf(dto.getBoardCategory()));
+
+            if (existingBoard.getBoardCategory() == BoardCategory.NOTICE && SecurityContextHolder.getContext().getAuthentication().getAuthorities().iterator().next().getAuthority().equals("ROLE_USER")) throw new AccessDeniedException("User does not have proper authority.");
+
             existingBoard.setNickname(dto.getNickname());
             existingBoard.setTitle(dto.getTitle());
             existingBoard.setPreview(dto.getPreview());
