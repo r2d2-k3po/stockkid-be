@@ -29,6 +29,7 @@ public class Board extends BaseEntity {
     @NotNull
     private @Setter String nickname;
 
+    @NotNull
     private @Setter String title;
 
     @Column(length = 1024)
